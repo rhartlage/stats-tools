@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sampling Distribution Simulator</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: #f6f7fb;
+      color: #1a1a1a;
+    }
+    .app {
+      max-width: 1180px;
+      margin: 1rem auto 2rem;
+      padding: 0 1rem;
+    }
+    h1 { margin: 0 0 .25rem; font-size: 1.5rem; }
+    .subtitle { margin: 0 0 1rem; color: #444; }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: .75rem;
+      background: white;
+      border: 1px solid #dcdfe8;
+      border-radius: 10px;
+      padding: .75rem;
+      margin-bottom: .9rem;
+    }
+    .controls label { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; color: #444; }
+    select, button {
+      font: inherit;
+      border: 1px solid #bfc6da;
+      border-radius: 7px;
+      padding: .38rem .55rem;
+      background: #fff;
+    }
+    button { cursor: pointer; }
+    button.primary { background: #2d6cdf; color: #fff; border-color: #2d6cdf; }
+    button.secondary { background: #edf3ff; border-color: #c2d6ff; }
+    .button-group { display: flex; gap: .45rem; align-items: end; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .75rem;
+      margin: .6rem 0 1rem;
+    }
+    .stat-card {
+      background: white;
+      border: 1px solid #dcdfe8;
+      border-radius: 8px;
+      padding: .45rem .6rem;
+      font-size: .9rem;
+    }
+    .stat-card .k { color: #51608a; }
+    .stat-card .v { font-weight: 600; }
+    .panels {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .85rem;
+    }
+    .panel {
+      background: #fff;
+      border: 1px solid #dcdfe8;
+      border-radius: 10px;
+      padding: .55rem;
+    }
+    .panel h2 { margin: 0 0 .4rem; font-size: 1rem; }
+    canvas {
+      width: 100%;
+      height: 260px;
+      border: 1px solid #e5e8f2;
+      border-radius: 6px;
+      display: block;
+      background: #fff;
+    }
+    .hint { font-size: .82rem; color: #4e5a7b; margin-top: .4rem; }
+    @media (max-width: 920px) {
+      .controls { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+      .panels { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Sampling Distribution Simulator</h1>
+    <p class="subtitle">Standalone recreation of the OnlineStatBook sampling distribution simulation.</p>
+
+    <section class="controls">
+      <label>
+        Population
+        <select id="populationType">
+          <option value="normal">Normal</option>
+          <option value="uniform">Uniform</option>
+          <option value="skewed">Right-skewed</option>
+          <option value="bimodal">Bimodal</option>
+        </select>
+      </label>
+      <label>
+        Statistic
+        <select id="statisticType">
+          <option value="mean">Mean</option>
+          <option value="median">Median</option>
+          <option value="sd">SD (N denominator)</option>
+          <option value="variance">Variance (N denominator)</option>
+          <option value="varianceUnbiased">Variance (N-1 denominator)</option>
+          <option value="mad">Mean absolute deviation</option>
+          <option value="range">Range</option>
+        </select>
+      </label>
+      <label>
+        Sample size (n)
+        <select id="sampleSize">
+          <option>2</option><option selected>5</option><option>10</option><option>16</option><option>20</option><option>25</option>
+        </select>
+      </label>
+      <label>
+        Bins
+        <select id="bins">
+          <option>20</option><option selected>30</option><option>40</option><option>50</option>
+        </select>
+      </label>
+      <label>
+        Speed (ms between animated points)
+        <select id="speed">
+          <option>40</option><option selected>20</option><option>10</option><option>0</option>
+        </select>
+      </label>
+      <div class="button-group">
+        <button id="animateBtn" class="primary">Animated sample</button>
+        <button id="sample5Btn" class="secondary">5 samples</button>
+        <button id="sample1000Btn" class="secondary">1000 samples</button>
+        <button id="sample10000Btn" class="secondary">10000 samples</button>
+        <button id="fitNormalBtn">Fit normal: Off</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card"><span class="k">Population mean:</span> <span class="v" id="popMean">-</span></div>
+      <div class="stat-card"><span class="k">Population median:</span> <span class="v" id="popMedian">-</span></div>
+      <div class="stat-card"><span class="k">Population SD:</span> <span class="v" id="popSd">-</span></div>
+      <div class="stat-card"><span class="k">Reps:</span> <span class="v" id="reps">0</span></div>
+    </section>
+
+    <section class="panels">
+      <article class="panel">
+        <h2>Population distribution</h2>
+        <canvas id="populationCanvas" width="560" height="260"></canvas>
+        <div class="hint">Blue = mean, purple = median, red = ±1 SD.</div>
+      </article>
+      <article class="panel">
+        <h2>Current sample</h2>
+        <canvas id="sampleCanvas" width="560" height="260"></canvas>
+        <div class="hint">Shows the latest sample drawn from the population.</div>
+      </article>
+      <article class="panel">
+        <h2>Sampling distribution of selected statistic</h2>
+        <canvas id="samplingCanvas" width="560" height="260"></canvas>
+        <div class="hint" id="samplingHint">Each sample contributes one value.</div>
+      </article>
+      <article class="panel">
+        <h2>Sampling distribution of means (reference)</h2>
+        <canvas id="meanSamplingCanvas" width="560" height="260"></canvas>
+        <div class="hint">Useful for central limit theorem comparisons.</div>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      populationValues: [],
+      sampleValues: [],
+      statReplications: [],
+      meanReplications: [],
+      fitNormal: false
+    };
+
+    const controls = {
+      populationType: document.getElementById('populationType'),
+      statisticType: document.getElementById('statisticType'),
+      sampleSize: document.getElementById('sampleSize'),
+      bins: document.getElementById('bins'),
+      speed: document.getElementById('speed')
+    };
+
+    const ui = {
+      popMean: document.getElementById('popMean'),
+      popMedian: document.getElementById('popMedian'),
+      popSd: document.getElementById('popSd'),
+      reps: document.getElementById('reps'),
+      samplingHint: document.getElementById('samplingHint'),
+      fitNormalBtn: document.getElementById('fitNormalBtn')
+    };
+
+    const canvases = {
+      population: document.getElementById('populationCanvas'),
+      sample: document.getElementById('sampleCanvas'),
+      sampling: document.getElementById('samplingCanvas'),
+      meanSampling: document.getElementById('meanSamplingCanvas')
+    };
+
+    function randNormal(mean = 50, sd = 10) {
+      const u1 = Math.random() || 1e-12;
+      const u2 = Math.random();
+      const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+      return mean + z * sd;
+    }
+
+    function generatePopulation(type, n = 12000) {
+      const vals = [];
+      for (let i = 0; i < n; i++) {
+        let v;
+        switch (type) {
+          case 'uniform':
+            v = 20 + Math.random() * 60;
+            break;
+          case 'skewed':
+            v = 20 + (-Math.log(1 - Math.random())) * 12;
+            break;
+          case 'bimodal':
+            v = Math.random() < 0.5 ? randNormal(38, 7) : randNormal(64, 6);
+            break;
+          default:
+            v = randNormal(50, 10);
+        }
+        vals.push(clamp(v, 0, 100));
+      }
+      return vals;
+    }
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function mean(a) { return a.reduce((s, x) => s + x, 0) / a.length; }
+    function median(a) {
+      const b = [...a].sort((x, y) => x - y);
+      const m = Math.floor(b.length / 2);
+      return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2;
+    }
+    function variance(a, unbiased = false) {
+      const m = mean(a);
+      const denom = unbiased ? Math.max(1, a.length - 1) : a.length;
+      return a.reduce((s, x) => s + (x - m) ** 2, 0) / denom;
+    }
+    function sd(a) { return Math.sqrt(variance(a, false)); }
+
+    function sampleFromPopulation(k) {
+      const out = [];
+      for (let i = 0; i < k; i++) {
+        out.push(state.populationValues[(Math.random() * state.populationValues.length) | 0]);
+      }
+      return out;
+    }
+
+    function computeStatistic(values) {
+      switch (controls.statisticType.value) {
+        case 'median': return median(values);
+        case 'sd': return Math.sqrt(variance(values, false));
+        case 'variance': return variance(values, false);
+        case 'varianceUnbiased': return variance(values, true);
+        case 'mad': {
+          const m = mean(values);
+          return values.reduce((s, x) => s + Math.abs(x - m), 0) / values.length;
+        }
+        case 'range': return Math.max(...values) - Math.min(...values);
+        default: return mean(values);
+      }
+    }
+
+    function histogram(values, bins, minX = 0, maxX = 100) {
+      const counts = Array(bins).fill(0);
+      const width = (maxX - minX) / bins;
+      values.forEach(v => {
+        const idx = Math.max(0, Math.min(bins - 1, Math.floor((v - minX) / width)));
+        counts[idx] += 1;
+      });
+      return { counts, width, minX, maxX };
+    }
+
+    function drawHistogram(canvas, values, opts = {}) {
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      const pad = { l: 38, r: 12, t: 14, b: 24 };
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, W, H);
+
+      if (!values.length) return;
+      const bins = Number(controls.bins.value);
+      const minX = opts.minX ?? 0;
+      const maxX = opts.maxX ?? 100;
+      const hist = histogram(values, bins, minX, maxX);
+      const maxCount = Math.max(...hist.counts, 1);
+      const plotW = W - pad.l - pad.r;
+      const plotH = H - pad.t - pad.b;
+      const bw = plotW / bins;
+
+      ctx.strokeStyle = '#cad2e8';
+      ctx.strokeRect(pad.l, pad.t, plotW, plotH);
+
+      hist.counts.forEach((c, i) => {
+        const h = (c / maxCount) * (plotH - 2);
+        const x = pad.l + i * bw;
+        const y = pad.t + plotH - h;
+        ctx.fillStyle = opts.barColor || '#91b4ff';
+        ctx.fillRect(x + 0.6, y, bw - 1.2, h);
+      });
+
+      if (opts.showMarkers) {
+        const m = mean(values), med = median(values), s = sd(values);
+        drawMarker(ctx, pad, m, minX, maxX, '#2d6cdf', plotH);
+        drawMarker(ctx, pad, med, minX, maxX, '#7a3ec8', plotH);
+        drawMarker(ctx, pad, m - s, minX, maxX, '#d13f3f', plotH, true);
+        drawMarker(ctx, pad, m + s, minX, maxX, '#d13f3f', plotH, true);
+      }
+
+      if (opts.fitNormal) {
+        const mu = mean(values);
+        const sig = Math.max(sd(values), 1e-9);
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let i = 0; i < bins; i++) {
+          const xVal = minX + (i + 0.5) * (maxX - minX) / bins;
+          const density = (1 / (sig * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((xVal - mu) / sig) ** 2);
+          const scaled = density * values.length * hist.width;
+          const y = pad.t + plotH - (scaled / maxCount) * (plotH - 2);
+          const x = pad.l + (i + 0.5) * bw;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.lineWidth = 1;
+      }
+
+      ctx.fillStyle = '#5f6a89';
+      ctx.font = '11px sans-serif';
+      ctx.fillText(String(minX.toFixed(0)), pad.l, H - 6);
+      ctx.fillText(String(maxX.toFixed(0)), W - pad.r - 24, H - 6);
+    }
+
+    function drawMarker(ctx, pad, val, minX, maxX, color, plotH, short = false) {
+      const plotW = ctx.canvas.width - pad.l - pad.r;
+      const x = pad.l + ((val - minX) / (maxX - minX)) * plotW;
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x, pad.t + (short ? plotH - 15 : 0));
+      ctx.lineTo(x, pad.t + plotH);
+      ctx.stroke();
+    }
+
+    function updatePopulationStats() {
+      ui.popMean.textContent = mean(state.populationValues).toFixed(3);
+      ui.popMedian.textContent = median(state.populationValues).toFixed(3);
+      ui.popSd.textContent = sd(state.populationValues).toFixed(3);
+      ui.reps.textContent = String(state.statReplications.length);
+      ui.samplingHint.textContent = `Statistic: ${controls.statisticType.options[controls.statisticType.selectedIndex].text}`;
+    }
+
+    function redraw() {
+      drawHistogram(canvases.population, state.populationValues, { showMarkers: true, barColor: '#c6d7ff' });
+      drawHistogram(canvases.sample, state.sampleValues, { barColor: '#9cddc7' });
+      drawHistogram(canvases.sampling, state.statReplications, {
+        minX: 0,
+        maxX: Math.max(100, ...state.statReplications, 100),
+        barColor: '#f6c18d',
+        fitNormal: state.fitNormal
+      });
+      drawHistogram(canvases.meanSampling, state.meanReplications, {
+        minX: 0,
+        maxX: 100,
+        barColor: '#d2b7f8'
+      });
+      updatePopulationStats();
+    }
+
+    function resetSimulation() {
+      state.populationValues = generatePopulation(controls.populationType.value);
+      state.sampleValues = [];
+      state.statReplications = [];
+      state.meanReplications = [];
+      redraw();
+    }
+
+    async function runSamples(count, animated = false) {
+      const n = Number(controls.sampleSize.value);
+      const delay = Number(controls.speed.value);
+      for (let i = 0; i < count; i++) {
+        const s = sampleFromPopulation(n);
+        state.sampleValues = s;
+        state.statReplications.push(computeStatistic(s));
+        state.meanReplications.push(mean(s));
+        if (animated) {
+          redraw();
+          if (delay > 0) await new Promise(r => setTimeout(r, delay));
+        }
+      }
+      redraw();
+    }
+
+    document.getElementById('animateBtn').addEventListener('click', () => runSamples(1, true));
+    document.getElementById('sample5Btn').addEventListener('click', () => runSamples(5, false));
+    document.getElementById('sample1000Btn').addEventListener('click', () => runSamples(1000, false));
+    document.getElementById('sample10000Btn').addEventListener('click', () => runSamples(10000, false));
+    document.getElementById('resetBtn').addEventListener('click', resetSimulation);
+    document.getElementById('fitNormalBtn').addEventListener('click', () => {
+      state.fitNormal = !state.fitNormal;
+      ui.fitNormalBtn.textContent = `Fit normal: ${state.fitNormal ? 'On' : 'Off'}`;
+      redraw();
+    });
+
+    ['populationType', 'statisticType', 'sampleSize', 'bins'].forEach(id => {
+      controls[id].addEventListener('change', () => {
+        if (id === 'populationType') resetSimulation(); else redraw();
+      });
+    });
+
+    resetSimulation();
+  </script>
+</body>
+</html>

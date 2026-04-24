@@ -1,0 +1,89 @@
+:root {
+  --bg: #f7f9fc;
+  --card: #ffffff;
+  --text: #1c2533;
+  --accent: #2a65ff;
+  --shade: rgba(42, 101, 255, 0.35);
+  --line: #93a0b5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 { margin-bottom: 0.35rem; }
+
+.controls {
+  background: var(--card);
+  border: 1px solid #dde3ef;
+  border-radius: 12px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+label { display: grid; gap: 0.4rem; font-weight: 600; }
+
+input[type="range"], select {
+  width: 100%;
+}
+
+.results {
+  margin-top: 1rem;
+  background: var(--card);
+  border: 1px solid #dde3ef;
+  border-radius: 12px;
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+
+#answerText {
+  margin-top: 0.4rem;
+  font-weight: 700;
+  color: #0b3bbb;
+}
+
+.graph {
+  margin-top: 1rem;
+  background: var(--card);
+  border: 1px solid #dde3ef;
+  border-radius: 12px;
+  padding: 0.7rem;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.examples {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+button {
+  border: 1px solid #bfd0ff;
+  background: #edf2ff;
+  color: #15337f;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover { background: #dfe8ff; }
+
+footer { margin: 1rem 0 0.2rem; }

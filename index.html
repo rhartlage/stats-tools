@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BUS-2150 | Course Tools</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --text: #1f2937;
+      --muted: #4b5563;
+      --card: #ffffff;
+      --border: #d1d5db;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1rem 2rem;
+    }
+
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      margin: 0 0 1.5rem;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      margin-bottom: 1rem;
+      color: var(--muted);
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      background: var(--primary);
+      color: #fff;
+      padding: 0.55rem 0.9rem;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .btn:hover {
+      background: var(--primary-hover);
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    code {
+      background: #eef2ff;
+      padding: 0.1rem 0.35rem;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>BUS-2150 Course Tools</h1>
+    <p class="subtitle">Interactive learning modules and class resources.</p>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Sampling Distribution Simulator</h2>
+        <p>
+          Explore repeated sampling, statistics, and sampling distributions.
+        </p>
+        <a class="btn" href="./modules/sampling-distribution/index.html">Open Module</a>
+      </article>
+
+      <article class="card">
+        <h2>Normal Area Explorer</h2>
+        <p>
+          Explore z-scores and area under the Normal Distibution.
+        </p>
+        <a class="btn" href="./modules/normal-area-explorer/index.html">Open Module</a>
+      </article>
+
+      <article class="card">
+        <h2>Linear Regression Explorer</h2>
+        <p>
+          Explore Regression Concepts.
+        </p>
+        <a class="btn" href="./modules/linear-regression/index.html">Open Module</a>
+      </article>
+
+      <article class="card">
+        <h2>More Modules Coming Soon</h2>
+        <p>
+          This course homepage will grow as new tools are added.
+        </p>
+      </article>
+    </section>
+
+     </main>
+</body>
+</html>

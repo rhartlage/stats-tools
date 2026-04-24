@@ -1,0 +1,32 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linear Regression Playground</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <section class="panel">
+      <h1>Linear Regression Playground</h1>
+      <p>Click chart to add points. Best-fit line updates live.</p>
+      <div class="controls">
+        <button id="randomBtn">Generate random points</button>
+        <button id="clearBtn">Clear points</button>
+      </div>
+      <ul class="stats">
+        <li>Points: <span id="count">0</span></li>
+        <li>Slope (m): <span id="slope">—</span></li>
+        <li>Intercept (b): <span id="intercept">—</span></li>
+        <li>MSE: <span id="mse">—</span></li>
+        <li>R²: <span id="r2">—</span></li>
+      </ul>
+    </section>
+    <section class="chartBox">
+      <svg id="chart" viewBox="0 0 800 500"></svg>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

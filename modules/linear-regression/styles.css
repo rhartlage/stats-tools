@@ -1,0 +1,18 @@
+﻿* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; background: #f5f7fb; color: #1b1f2a; }
+.wrap { display: grid; grid-template-columns: 320px 1fr; gap: 12px; min-height: 100vh; padding: 12px; }
+.panel, .chartBox { background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,.08); }
+.panel { padding: 12px; }
+.controls { display: flex; gap: 8px; margin: 10px 0; }
+button { border: 0; background: #3658ff; color: white; border-radius: 7px; padding: 8px 10px; cursor: pointer; font-weight: 600; }
+button:hover { background: #2946d4; }
+.stats { list-style: none; padding: 0; line-height: 1.8; margin: 8px 0 0; }
+#chart { width: 100%; height: calc(100vh - 24px); min-height: 420px; display: block; border-radius: 8px; }
+.grid { stroke: #e5e8ef; stroke-width: 1; }
+.axis { stroke: #9aa3b2; stroke-width: 1.5; }
+.point { fill: #1f7aef; }
+.fit { stroke: #ff4f69; stroke-width: 2.5; }
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: 1fr; }
+  #chart { height: 60vh; }
+}

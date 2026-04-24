@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Normal Model Area Explorer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Standard Normal Area Explorer</h1>
+      <p>
+        Use the sliders to model questions like: <em>What percent of a standard normal model is in each region?</em>
+      </p>
+
+      <section class="controls" aria-label="Controls">
+        <label>
+          Region type
+          <select id="regionType">
+            <option value="right">z &gt; a</option>
+            <option value="left">z &lt; a</option>
+            <option value="between">a &lt; z &lt; b</option>
+            <option value="absGreater">|z| &gt; a</option>
+          </select>
+        </label>
+
+        <label>
+          a = <span id="aValue">1.15</span>
+          <input id="aSlider" type="range" min="-3.5" max="3.5" step="0.01" value="1.15" />
+        </label>
+
+        <label id="bControl">
+          b = <span id="bValue">1.45</span>
+          <input id="bSlider" type="range" min="-3.5" max="3.5" step="0.01" value="1.45" />
+        </label>
+      </section>
+
+      <section class="results" aria-live="polite">
+        <div id="questionText"></div>
+        <div id="answerText"></div>
+      </section>
+
+      <section class="graph">
+        <svg id="normalSvg" viewBox="0 0 900 360" role="img" aria-label="Normal curve with shaded probability region"></svg>
+      </section>
+
+      <details>
+        <summary>Classroom-ready examples (click to load)</summary>
+        <div class="examples">
+          <button data-type="right" data-a="1.15">z &gt; 1.15</button>
+          <button data-type="left" data-a="1.45">z &lt; 1.45</button>
+          <button data-type="between" data-a="-0.95" data-b="1.55">-0.95 &lt; z &lt; 1.55</button>
+          <button data-type="absGreater" data-a="1.3">|z| &gt; 1.3</button>
+        </div>
+      </details>
+
+      <footer>
+        <small>
+          Tip: push this folder to GitHub and enable <strong>Settings → Pages</strong> to deploy as a free static web app.
+        </small>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
