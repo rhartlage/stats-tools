@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BUS-2150 | Course Tools</title>
+  <title>BUS Course Tools</title>
   <style>
     :root {
       --bg: #f7f9fc;
@@ -44,6 +44,20 @@
       gap: 1rem;
     }
 
+    .section {
+      margin-top: 2rem;
+    }
+
+    .section h2 {
+      margin: 0 0 0.35rem;
+      font-size: 1.4rem;
+    }
+
+    .section-copy {
+      margin: 0 0 1rem;
+      color: var(--muted);
+    }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -75,6 +89,12 @@
       background: var(--primary-hover);
     }
 
+    .coming-soon {
+      display: inline-block;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
     footer {
       margin-top: 1.5rem;
       color: var(--muted);
@@ -90,40 +110,60 @@
 </head>
 <body>
   <main class="wrap">
-    <h1>BUS-2150 Course Tools</h1>
-    <p class="subtitle">Interactive learning modules and class resources.</p>
+    <h1>BUS Course Tools</h1>
+    <p class="subtitle">Interactive learning modules and class resources across BUS-2150 and BUS-3150.</p>
 
-    <section class="grid">
-      <article class="card">
-        <h2>Sampling Distribution Explorer</h2>
-        <p>
-          Draw unusual populations, watch each sample, and see the sampling distribution converge.
-        </p>
-        <a class="btn" href="./modules/sampling-distribution/index.html">Open Module</a>
-      </article>
+    <section class="section">
+      <h2>BUS-2150</h2>
+      <p class="section-copy">Interactive statistics modules for class demos, practice, and review.</p>
 
-      <article class="card">
-        <h2>Normal Area Explorer</h2>
-        <p>
-          Explore z-scores and area under the Normal Distibution.
-        </p>
-        <a class="btn" href="./modules/normal-area-explorer/index.html">Open Module</a>
-      </article>
+      <div class="grid">
+        <article class="card">
+          <h2>Sampling Distribution Explorer</h2>
+          <p>
+            Draw unusual populations, watch each sample, and see the sampling distribution converge.
+          </p>
+          <a class="btn" href="./modules/sampling-distribution/index.html">Open Module</a>
+        </article>
 
-      <article class="card">
-        <h2>Linear Regression Explorer</h2>
-        <p>
-          Explore Regression Concepts.
-        </p>
-        <a class="btn" href="./modules/linear-regression/index.html">Open Module</a>
-      </article>
+        <article class="card">
+          <h2>Normal Area Explorer</h2>
+          <p>
+            Explore z-scores and area under the Normal Distibution.
+          </p>
+          <a class="btn" href="./modules/normal-area-explorer/index.html">Open Module</a>
+        </article>
 
-      <article class="card">
-        <h2>More Modules Coming Soon</h2>
-        <p>
-          This course homepage will grow as new tools are added.
-        </p>
-      </article>
+        <article class="card">
+          <h2>Linear Regression Explorer</h2>
+          <p>
+            Explore Regression Concepts.
+          </p>
+          <a class="btn" href="./modules/linear-regression/index.html">Open Module</a>
+        </article>
+
+        <article class="card">
+          <h2>More Modules Coming Soon</h2>
+          <p>
+            This course homepage will grow as new tools are added.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>BUS-3150</h2>
+      <p class="section-copy">Optimization tools that are being staged for release.</p>
+
+      <div class="grid">
+        <article class="card">
+          <h2>Simplex Algorithm Explorer</h2>
+          <p>
+            Walk through the Simplex algorithm for a 3x3 or 4x4 linear program, including entering variables, ratio tests, and tableau pivots.
+          </p>
+          <span class="coming-soon">Coming soon</span>
+        </article>
+      </div>
     </section>
 
      </main>
