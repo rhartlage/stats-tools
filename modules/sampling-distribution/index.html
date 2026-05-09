@@ -4,204 +4,763 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sampling Distribution Simulator</title>
+  <meta
+    name="description"
+    content="Explore repeated sampling, sample statistics, and the shape of sampling distributions through simulation."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
   <style>
-    :root { color-scheme: light; }
+    :root {
+      color-scheme: light;
+      --bg: #f4efe4;
+      --bg-alt: #fbf7ef;
+      --ink: #162133;
+      --ink-soft: #516076;
+      --line: rgba(22, 33, 51, 0.12);
+      --line-strong: rgba(22, 33, 51, 0.22);
+      --panel: rgba(255, 252, 247, 0.82);
+      --panel-strong: rgba(255, 250, 242, 0.94);
+      --accent: #f05d3d;
+      --accent-deep: #c74b30;
+      --teal: #1f7a8c;
+      --teal-soft: rgba(31, 122, 140, 0.15);
+      --gold: #f5a623;
+      --gold-soft: rgba(245, 166, 35, 0.22);
+      --gold-line: rgba(245, 166, 35, 0.44);
+      --shadow: 0 24px 60px rgba(20, 28, 44, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
     body {
       margin: 0;
-      font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: #f6f7fb;
-      color: #1a1a1a;
+      min-height: 100%;
     }
-    .app {
-      max-width: 1180px;
-      margin: 1rem auto 2rem;
-      padding: 0 1rem;
+
+    body {
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(240, 93, 61, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(31, 122, 140, 0.14), transparent 26%),
+        linear-gradient(180deg, #f9f4e8 0%, #f2eadb 100%);
     }
-    h1 { margin: 0 0 .25rem; font-size: 1.5rem; }
-    .subtitle { margin: 0 0 1rem; color: #444; }
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(120px, 1fr));
-      gap: .75rem;
-      background: white;
-      border: 1px solid #dcdfe8;
-      border-radius: 10px;
-      padding: .75rem;
-      margin-bottom: .9rem;
-    }
-    .controls label { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; color: #444; }
-    select, button {
+
+    button,
+    select {
       font: inherit;
-      border: 1px solid #bfc6da;
-      border-radius: 7px;
-      padding: .38rem .55rem;
-      background: #fff;
     }
-    button { cursor: pointer; }
-    button.primary { background: #2d6cdf; color: #fff; border-color: #2d6cdf; }
-    button.secondary { background: #edf3ff; border-color: #c2d6ff; }
-    .button-group { display: flex; gap: .45rem; align-items: end; }
+
+    .page-shell {
+      max-width: 1520px;
+      margin: 0 auto;
+      padding: 32px 20px 36px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow,
+    .section-kicker {
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent-deep);
+    }
+
+    .hero h1,
+    .panel-head h2,
+    .card-head h3,
+    .chart-card h3 {
+      margin: 0;
+      font-family: "Space Grotesk", "Avenir Next", sans-serif;
+    }
+
+    .hero h1 {
+      max-width: 14ch;
+      font-size: clamp(2.35rem, 5vw, 4.9rem);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-copy {
+      max-width: 64ch;
+      margin: 0;
+      font-size: 1.02rem;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .workspace {
+      display: grid;
+      gap: 22px;
+      grid-template-columns: minmax(360px, 500px) minmax(0, 1fr);
+    }
+
+    .control-column {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+
+    .control-panel,
+    .graph-panel {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .panel-head,
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel-head h2 {
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      letter-spacing: -0.03em;
+    }
+
+    .panel-head p,
+    .card-head p,
+    .graph-hint,
+    .hint,
+    .live-note {
+      margin: 6px 0 0;
+      line-height: 1.5;
+      color: var(--ink-soft);
+    }
+
+    .card {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+    }
+
+    .accent-card {
+      background:
+        linear-gradient(180deg, rgba(255, 249, 239, 0.7), rgba(255, 231, 190, 0.82)),
+        var(--gold-soft);
+      border-color: var(--gold-line);
+    }
+
+    .status-card {
+      background:
+        linear-gradient(180deg, rgba(31, 122, 140, 0.08), rgba(255, 255, 255, 0.74)),
+        var(--panel-strong);
+    }
+
+    .card-head h3,
+    .chart-card h3 {
+      font-size: 1.12rem;
+    }
+
+    .card-head.compact {
+      margin-bottom: 14px;
+    }
+
+    .pill-row,
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .spotlight-button {
+      min-width: 220px;
+    }
+
+    .return-link-button,
+    .return-link-button:visited,
+    .return-link-button:hover,
+    .return-link-button:active {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .return-link-button {
+      background: #dce7e6;
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    .return-link-button:hover {
+      background: #d3e0de;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent-deep);
+      background: rgba(240, 93, 61, 0.1);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--ink);
+      background: rgba(31, 122, 140, 0.12);
+      text-decoration: none;
+      transition:
+        transform 0.16s ease,
+        background-color 0.16s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      background: rgba(31, 122, 140, 0.2);
+    }
+
+    .button:disabled,
+    .button:disabled:hover {
+      opacity: 0.52;
+      cursor: not-allowed;
+      transform: none;
+      background: rgba(31, 122, 140, 0.12);
+    }
+
+    .button-primary,
+    .button-secondary,
+    .button-ghost {
+      color: var(--ink);
+      background: rgba(31, 122, 140, 0.12);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .control-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .control-grid + .button-row {
+      margin-top: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+    }
+
+    label span {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+
+    select {
+      width: 100%;
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line-strong);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+    }
+
+    select:focus,
+    .button:focus {
+      outline: 2px solid rgba(31, 122, 140, 0.35);
+      outline-offset: 2px;
+    }
+
+    .action-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    .action-grid .button {
+      width: min(100%, 360px);
+    }
+
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: .75rem;
-      margin: .6rem 0 1rem;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
     .stat-card {
-      background: white;
-      border: 1px solid #dcdfe8;
-      border-radius: 8px;
-      padding: .45rem .6rem;
-      font-size: .9rem;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
     }
-    .stat-card .k { color: #51608a; }
-    .stat-card .v { font-weight: 600; }
-    .panels {
+
+    .stat-card .k {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .stat-card .v {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .live-note {
+      font-size: 0.94rem;
+    }
+
+    .equation-card {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .equation-kicker {
+      margin: 0 0 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .math-display {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: .85rem;
+      gap: 8px;
+      color: var(--ink);
+      font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
     }
-    .panel {
-      background: #fff;
-      border: 1px solid #dcdfe8;
-      border-radius: 10px;
-      padding: .55rem;
+
+    .equation-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 1.12rem;
+      line-height: 1.25;
     }
-    .panel h2 { margin: 0 0 .4rem; font-size: 1rem; }
+
+    .math-symbol {
+      font-style: italic;
+    }
+
+    .math-frac {
+      display: inline-grid;
+      justify-items: center;
+      line-height: 1.05;
+      min-width: 62px;
+    }
+
+    .math-frac .num {
+      width: 100%;
+      padding: 0 6px 2px;
+      border-bottom: 1.5px solid currentColor;
+      text-align: center;
+    }
+
+    .math-frac .den {
+      width: 100%;
+      padding-top: 2px;
+      text-align: center;
+    }
+
+    .math-root {
+      display: inline-flex;
+      align-items: flex-start;
+      font-style: normal;
+    }
+
+    .math-root .radical {
+      font-size: 1.1em;
+      line-height: 1;
+    }
+
+    .math-root .radicand {
+      display: inline-block;
+      margin-left: 2px;
+      padding: 0 4px 1px 5px;
+      border-top: 1.5px solid currentColor;
+      line-height: 1;
+    }
+
+    .equation-note {
+      margin: 10px 0 0;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+
+    .canvas-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+    }
+
+    .chart-card {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+    }
+
     canvas {
       width: 100%;
-      height: 260px;
-      border: 1px solid #e5e8f2;
-      border-radius: 6px;
+      height: 280px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
       display: block;
-      background: #fff;
+      background: #fffaf2;
+      margin-top: 14px;
     }
-    .hint { font-size: .82rem; color: #4e5a7b; margin-top: .4rem; }
-    @media (max-width: 920px) {
-      .controls { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
-      .panels { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+    @media (max-width: 1120px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        padding-inline: 14px;
+      }
+
+      .control-grid,
+      .action-grid,
+      .stats-grid,
+      .canvas-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        max-width: 12ch;
+        font-size: clamp(2rem, 11vw, 3.25rem);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <h1>Sampling Distribution Simulator</h1>
-    <p class="subtitle">Standalone recreation of the OnlineStatBook sampling distribution simulation.</p>
-
-    <section class="controls">
-      <label>
-        Population
-        <select id="populationType">
-          <option value="normal">Normal</option>
-          <option value="uniform">Uniform</option>
-          <option value="skewed">Right-skewed</option>
-          <option value="bimodal">Bimodal</option>
-        </select>
-      </label>
-      <label>
-        Statistic
-        <select id="statisticType">
-          <option value="mean">Mean</option>
-          <option value="median">Median</option>
-          <option value="sd">SD (N denominator)</option>
-          <option value="variance">Variance (N denominator)</option>
-          <option value="varianceUnbiased">Variance (N-1 denominator)</option>
-          <option value="mad">Mean absolute deviation</option>
-          <option value="range">Range</option>
-        </select>
-      </label>
-      <label>
-        Sample size (n)
-        <select id="sampleSize">
-          <option>2</option><option selected>5</option><option>10</option><option>16</option><option>20</option><option>25</option>
-        </select>
-      </label>
-      <label>
-        Bins
-        <select id="bins">
-          <option>20</option><option selected>30</option><option>40</option><option>50</option>
-        </select>
-      </label>
-      <label>
-        Speed (ms between animated points)
-        <select id="speed">
-          <option>40</option><option selected>20</option><option>10</option><option>0</option>
-        </select>
-      </label>
-      <div class="button-group">
-        <button id="animateBtn" class="primary">Animated sample</button>
-        <button id="sample5Btn" class="secondary">5 samples</button>
-        <button id="sample1000Btn" class="secondary">1000 samples</button>
-        <button id="sample10000Btn" class="secondary">10000 samples</button>
-        <button id="fitNormalBtn">Fit normal: Off</button>
-        <button id="resetBtn">Reset</button>
+  <div class="page-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Sampling Distribution Explorer</p>
+        <h1>Sample again. Watch the statistic settle into a distribution.</h1>
       </div>
-    </section>
+      <p class="hero-copy">
+        Students can switch population shapes, choose a statistic, and compare one
+        current sample to the long-run sampling distribution that emerges from repeated draws.
+      </p>
+    </header>
 
-    <section class="stats-grid">
-      <div class="stat-card"><span class="k">Population mean:</span> <span class="v" id="popMean">-</span></div>
-      <div class="stat-card"><span class="k">Population median:</span> <span class="v" id="popMedian">-</span></div>
-      <div class="stat-card"><span class="k">Population SD:</span> <span class="v" id="popSd">-</span></div>
-      <div class="stat-card"><span class="k">Reps:</span> <span class="v" id="reps">0</span></div>
-    </section>
+    <main class="workspace">
+      <div class="control-column">
+        <div class="button-row">
+          <a
+            class="button button-secondary spotlight-button return-link-button"
+            href="https://rhartlage.github.io/"
+          >
+            Return to Dr. H&apos;s Main GitHub Tools Page
+          </a>
+        </div>
 
-    <section class="panels">
-      <article class="panel">
-        <h2>Population distribution</h2>
-        <canvas id="populationCanvas" width="560" height="260"></canvas>
-        <div class="hint">Blue = mean, purple = median, red = ±1 SD.</div>
-      </article>
-      <article class="panel">
-        <h2>Current sample</h2>
-        <canvas id="sampleCanvas" width="560" height="260"></canvas>
-        <div class="hint">Shows the latest sample drawn from the population.</div>
-      </article>
-      <article class="panel">
-        <h2>Sampling distribution of selected statistic</h2>
-        <canvas id="samplingCanvas" width="560" height="260"></canvas>
-        <div class="hint" id="samplingHint">Each sample contributes one value.</div>
-      </article>
-      <article class="panel">
-        <h2>Sampling distribution of means (reference)</h2>
-        <canvas id="meanSamplingCanvas" width="560" height="260"></canvas>
-        <div class="hint">Useful for central limit theorem comparisons.</div>
-      </article>
-    </section>
+        <section class="panel control-panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-kicker">Setup</p>
+              <h2>Population, statistic, and run controls</h2>
+            </div>
+          </div>
+
+          <section class="card">
+            <div class="card-head compact">
+              <div>
+                <h3>Simulation inputs</h3>
+                <p>Choose what the population looks like, what you measure, and how quickly the animation runs.</p>
+              </div>
+            </div>
+
+            <div class="form-grid control-grid">
+              <label>
+                <span>Population</span>
+                <select id="populationType">
+                  <option value="normal">Normal</option>
+                  <option value="uniform">Uniform</option>
+                  <option value="skewed">Right-skewed</option>
+                  <option value="bimodal">Bimodal</option>
+                  <option value="custom">Custom drawn</option>
+                </select>
+              </label>
+              <label>
+                <span>Statistic</span>
+                <select id="statisticType">
+                  <option value="mean">Mean</option>
+                  <option value="median">Median</option>
+                  <option value="sd">SD (N denominator)</option>
+                  <option value="variance">Variance (N denominator)</option>
+                  <option value="varianceUnbiased">Variance (N-1 denominator)</option>
+                  <option value="mad">Mean absolute deviation</option>
+                  <option value="range">Range</option>
+                </select>
+              </label>
+              <label>
+                <span>Sample size (n)</span>
+                <select id="sampleSize">
+                  <option>2</option>
+                  <option selected>5</option>
+                  <option>30</option>
+                </select>
+              </label>
+            </div>
+
+            <p class="live-note" id="customModeNote">
+              Choose Custom drawn to sculpt a strange population directly on the population chart.
+            </p>
+          </section>
+
+          <section class="card accent-card">
+            <div class="card-head compact">
+              <div>
+                <h3>Run the experiment</h3>
+                <p>Start with one animated draw, then scale up to see the sampling pattern stabilize.</p>
+              </div>
+            </div>
+
+            <div class="action-grid">
+              <button id="animateBtn" class="button button-primary button-wide" type="button">Draw 1 animated sample</button>
+              <button id="sample5Btn" class="button button-secondary" type="button">Run 5 samples</button>
+              <button id="sample1000Btn" class="button button-secondary" type="button">Run 10,000 samples</button>
+              <button id="sample10000Btn" class="button button-secondary" type="button">Run 100,000 samples</button>
+            </div>
+          </section>
+
+          <section class="card status-card">
+            <div class="card-head compact">
+              <div>
+                <h3>Live readout</h3>
+                <p>These values update as the simulation runs and the distribution builds.</p>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <article class="stat-card">
+                <span class="k">Population mean</span>
+                <span class="v" id="popMean">-</span>
+              </article>
+              <article class="stat-card">
+                <span class="k">Population SD</span>
+                <span class="v" id="popSd">-</span>
+              </article>
+              <article class="stat-card">
+                <span class="k">Sampling dist. mean</span>
+                <span class="v" id="samplingMean">-</span>
+              </article>
+              <article class="stat-card">
+                <span class="k">Sampling dist. SD</span>
+                <span class="v" id="samplingSd">-</span>
+              </article>
+            </div>
+
+            <p class="live-note" id="samplingHint">Replications: 0. Selected statistic: Mean.</p>
+            <div class="equation-card">
+              <p class="equation-kicker" id="seEquationLabel">Observed Standard Error</p>
+              <div class="math-display" id="seEquation"></div>
+              <p class="equation-note" id="seEquationNote">This will update as replications accumulate.</p>
+            </div>
+          </section>
+        </section>
+      </div>
+
+      <section class="panel graph-panel">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">Visualization</p>
+            <h2>Population, sample, and the sampling distribution</h2>
+          </div>
+        </div>
+
+        <p class="graph-hint">
+          Compare the parent population, the current sample, and the chosen statistic&apos;s
+          sampling distribution side by side.
+        </p>
+
+        <section class="canvas-grid">
+          <article class="chart-card">
+            <h3>Population distribution</h3>
+            <p class="hint" id="populationHint">Blue marks the mean, purple the median, and orange the sample-space spread around the mean.</p>
+            <canvas id="populationCanvas" width="560" height="260"></canvas>
+          </article>
+
+          <article class="chart-card">
+            <h3>Current sample draw</h3>
+            <p class="hint">This panel resets on each draw so students can focus on the current sample only.</p>
+            <canvas id="sampleCanvas" width="560" height="260"></canvas>
+          </article>
+
+          <article class="chart-card">
+            <h3>Sampling distribution of selected statistic</h3>
+            <p class="hint">Every sample adds one new statistic box to this growing stack.</p>
+            <canvas id="samplingCanvas" width="560" height="260"></canvas>
+          </article>
+        </section>
+      </section>
+    </main>
   </div>
 
   <script>
+    const theme = {
+      canvasBg: "#fffaf2",
+      border: "rgba(22, 33, 51, 0.16)",
+      axisText: "#516076",
+      mean: "#2f6df6",
+      median: "#a13cf5",
+      markerLabelBg: "rgba(255, 250, 242, 0.95)",
+      spread: "#e05f35",
+      populationBar: "#cbd9ff",
+      sampleBar: "#b8e4d2",
+      sampleBoxBorder: "rgba(31, 122, 140, 0.55)",
+      samplingBar: "#f5c792",
+      samplingBoxBorder: "rgba(240, 166, 35, 0.55)",
+      normalCurve: "#162133",
+    };
+
+    const POPULATION_MIN = 0;
+    const POPULATION_MAX = 100;
+    const POPULATION_SIZE = 12000;
+    const CUSTOM_EDITOR_BINS = 80;
+    const FIXED_HISTOGRAM_BINS = 40;
+    const FIXED_ANIMATION_DELAY_MS = 20;
+    const BULK_RUN_YIELD_EVERY = 10000;
+    const MAX_REPLICATIONS = 2000000;
+
+    function createZeroCounts(binCount = FIXED_HISTOGRAM_BINS) {
+      return Array(binCount).fill(0);
+    }
+
     const state = {
       populationValues: [],
       sampleValues: [],
+      sampleStackCounts: createZeroCounts(),
       statReplications: [],
-      meanReplications: [],
-      fitNormal: false
+      fitNormal: false,
+      customPopulationWeights: createCustomStarterWeights(),
+      customDrawing: false,
+      customLastPoint: null,
+      animation: {
+        running: false,
+        previewSampleValues: null,
+        highlightedPopulationValue: null,
+        incomingSample: null,
+        droppingStatistic: null
+      }
     };
 
     const controls = {
-      populationType: document.getElementById('populationType'),
-      statisticType: document.getElementById('statisticType'),
-      sampleSize: document.getElementById('sampleSize'),
-      bins: document.getElementById('bins'),
-      speed: document.getElementById('speed')
+      populationType: document.getElementById("populationType"),
+      statisticType: document.getElementById("statisticType"),
+      sampleSize: document.getElementById("sampleSize")
     };
 
     const ui = {
-      popMean: document.getElementById('popMean'),
-      popMedian: document.getElementById('popMedian'),
-      popSd: document.getElementById('popSd'),
-      reps: document.getElementById('reps'),
-      samplingHint: document.getElementById('samplingHint'),
-      fitNormalBtn: document.getElementById('fitNormalBtn')
+      popMean: document.getElementById("popMean"),
+      popSd: document.getElementById("popSd"),
+      samplingMean: document.getElementById("samplingMean"),
+      samplingSd: document.getElementById("samplingSd"),
+      samplingHint: document.getElementById("samplingHint"),
+      seEquationLabel: document.getElementById("seEquationLabel"),
+      seEquation: document.getElementById("seEquation"),
+      seEquationNote: document.getElementById("seEquationNote"),
+      customModeNote: document.getElementById("customModeNote"),
+      populationHint: document.getElementById("populationHint"),
+      animateBtn: document.getElementById("animateBtn"),
+      sample5Btn: document.getElementById("sample5Btn"),
+      sample1000Btn: document.getElementById("sample1000Btn"),
+      sample10000Btn: document.getElementById("sample10000Btn")
     };
 
     const canvases = {
-      population: document.getElementById('populationCanvas'),
-      sample: document.getElementById('sampleCanvas'),
-      sampling: document.getElementById('samplingCanvas'),
-      meanSampling: document.getElementById('meanSamplingCanvas')
+      population: document.getElementById("populationCanvas"),
+      sample: document.getElementById("sampleCanvas"),
+      sampling: document.getElementById("samplingCanvas")
     };
+
+    function bell(x, center, spread, amplitude) {
+      return amplitude * Math.exp(-0.5 * ((x - center) / spread) ** 2);
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function easeOutCubic(t) {
+      return 1 - (1 - t) ** 3;
+    }
+
+    function animateTransition(durationMs, onFrame) {
+      return new Promise(async (resolve) => {
+        const stepCount = Math.max(1, Math.round(Math.max(durationMs, 1) / 24));
+        for (let step = 0; step <= stepCount; step++) {
+          onFrame(step / stepCount);
+          if (step < stepCount) {
+            await sleep(durationMs / stepCount);
+          }
+        }
+        resolve();
+      });
+    }
+
+    function createCustomStarterWeights() {
+      return Array.from({ length: CUSTOM_EDITOR_BINS }, (_, index) => {
+        const leftSpike = bell(index, 12, 2.4, 1.9);
+        const middleShelf = index >= 28 && index <= 41 ? 0.42 : 0.04;
+        const middleDip = bell(index, 35, 2, 0.2);
+        const rightSpike = bell(index, 60, 2.8, 1.75);
+        const farRightShoulder = bell(index, 71, 3.8, 0.52);
+        return Math.max(0, leftSpike + middleShelf - middleDip + rightSpike + farRightShoulder);
+      });
+    }
 
     function randNormal(mean = 50, sd = 10) {
       const u1 = Math.random() || 1e-12;
@@ -210,41 +769,150 @@
       return mean + z * sd;
     }
 
-    function generatePopulation(type, n = 12000) {
+    function generatePopulation(type, n = POPULATION_SIZE) {
       const vals = [];
       for (let i = 0; i < n; i++) {
         let v;
         switch (type) {
-          case 'uniform':
+          case "uniform":
             v = 20 + Math.random() * 60;
             break;
-          case 'skewed':
+          case "skewed":
             v = 20 + (-Math.log(1 - Math.random())) * 12;
             break;
-          case 'bimodal':
+          case "bimodal":
             v = Math.random() < 0.5 ? randNormal(38, 7) : randNormal(64, 6);
             break;
           default:
             v = randNormal(50, 10);
         }
-        vals.push(clamp(v, 0, 100));
+        vals.push(clamp(v, POPULATION_MIN, POPULATION_MAX));
       }
       return vals;
     }
 
-    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-    function mean(a) { return a.reduce((s, x) => s + x, 0) / a.length; }
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function mean(a) {
+      return a.reduce((s, x) => s + x, 0) / a.length;
+    }
+
     function median(a) {
       const b = [...a].sort((x, y) => x - y);
       const m = Math.floor(b.length / 2);
       return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2;
     }
+
     function variance(a, unbiased = false) {
       const m = mean(a);
       const denom = unbiased ? Math.max(1, a.length - 1) : a.length;
       return a.reduce((s, x) => s + (x - m) ** 2, 0) / denom;
     }
-    function sd(a) { return Math.sqrt(variance(a, false)); }
+
+    function sd(a) {
+      return Math.sqrt(variance(a, false));
+    }
+
+    function fmt(value) {
+      return Number.isFinite(value) ? value.toFixed(3) : "-";
+    }
+
+    function sumSquaredDeviations(a, center = mean(a)) {
+      return a.reduce((sum, value) => sum + (value - center) ** 2, 0);
+    }
+
+    function customModeActive() {
+      return controls.populationType.value === "custom";
+    }
+
+    function createPopulationFromCustomWeights(weights, sampleCount = POPULATION_SIZE) {
+      const positiveWeights = weights.map((weight) => Math.max(0, weight));
+      const totalWeight = positiveWeights.reduce((sum, weight) => sum + weight, 0);
+      if (totalWeight <= 0) {
+        return [];
+      }
+
+      const rawAllocations = positiveWeights.map((weight) => (weight / totalWeight) * sampleCount);
+      const binAllocations = rawAllocations.map((value) => Math.floor(value));
+      let remaining = sampleCount - binAllocations.reduce((sum, value) => sum + value, 0);
+      const fractionalAllocations = rawAllocations
+        .map((value, index) => ({ index, fraction: value - Math.floor(value) }))
+        .sort((a, b) => b.fraction - a.fraction);
+
+      for (let i = 0; i < remaining; i++) {
+        binAllocations[fractionalAllocations[i % fractionalAllocations.length].index] += 1;
+      }
+
+      const values = [];
+      const binWidth = (POPULATION_MAX - POPULATION_MIN) / positiveWeights.length;
+      binAllocations.forEach((count, index) => {
+        if (!count) {
+          return;
+        }
+        const binStart = POPULATION_MIN + index * binWidth;
+        for (let j = 0; j < count; j++) {
+          values.push(binStart + ((j + 0.5) / count) * binWidth);
+        }
+      });
+      return values;
+    }
+
+    function clearReplications() {
+      state.sampleValues = [];
+      state.sampleStackCounts = createZeroCounts();
+      state.statReplications = [];
+    }
+
+    function accumulateHistogramCounts(values, counts, minX = POPULATION_MIN, maxX = POPULATION_MAX) {
+      const width = (maxX - minX) / counts.length;
+      values.forEach((value) => {
+        const index = Math.max(0, Math.min(counts.length - 1, Math.floor((value - minX) / width)));
+        counts[index] += 1;
+      });
+    }
+
+    function maxValueOrFloor(values, floor, extraValue = null) {
+      let max = floor;
+      values.forEach((value) => {
+        if (value > max) {
+          max = value;
+        }
+      });
+      if (extraValue != null && extraValue > max) {
+        max = extraValue;
+      }
+      return max;
+    }
+
+    function getRemainingReplicationCapacity() {
+      return Math.max(0, MAX_REPLICATIONS - state.statReplications.length);
+    }
+
+    function getDisplayedStatReplications() {
+      return state.animation.droppingStatistic
+        ? [...state.statReplications, state.animation.droppingStatistic.value]
+        : state.statReplications;
+    }
+
+    function resetVisualizationState() {
+      clearReplications();
+      resetAnimationState();
+      state.animation.running = false;
+      redraw();
+    }
+
+    function rebuildPopulationValues(resetRuns = true) {
+      if (customModeActive()) {
+        state.populationValues = createPopulationFromCustomWeights(state.customPopulationWeights);
+      } else {
+        state.populationValues = generatePopulation(controls.populationType.value);
+      }
+      if (resetRuns) {
+        clearReplications();
+      }
+    }
 
     function sampleFromPopulation(k) {
       const out = [];
@@ -256,164 +924,832 @@
 
     function computeStatistic(values) {
       switch (controls.statisticType.value) {
-        case 'median': return median(values);
-        case 'sd': return Math.sqrt(variance(values, false));
-        case 'variance': return variance(values, false);
-        case 'varianceUnbiased': return variance(values, true);
-        case 'mad': {
+        case "median":
+          return median(values);
+        case "sd":
+          return Math.sqrt(variance(values, false));
+        case "variance":
+          return variance(values, false);
+        case "varianceUnbiased":
+          return variance(values, true);
+        case "mad": {
           const m = mean(values);
           return values.reduce((s, x) => s + Math.abs(x - m), 0) / values.length;
         }
-        case 'range': return Math.max(...values) - Math.min(...values);
-        default: return mean(values);
+        case "range":
+          return Math.max(...values) - Math.min(...values);
+        default:
+          return mean(values);
       }
     }
 
     function histogram(values, bins, minX = 0, maxX = 100) {
       const counts = Array(bins).fill(0);
       const width = (maxX - minX) / bins;
-      values.forEach(v => {
+      values.forEach((v) => {
         const idx = Math.max(0, Math.min(bins - 1, Math.floor((v - minX) / width)));
         counts[idx] += 1;
       });
       return { counts, width, minX, maxX };
     }
 
-    function drawHistogram(canvas, values, opts = {}) {
-      const ctx = canvas.getContext('2d');
-      const W = canvas.width, H = canvas.height;
+    function getPlotLayout(canvas) {
       const pad = { l: 38, r: 12, t: 14, b: 24 };
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(0, 0, W, H);
+      const W = canvas.width;
+      const H = canvas.height;
+      return {
+        W,
+        H,
+        pad,
+        plotW: W - pad.l - pad.r,
+        plotH: H - pad.t - pad.b,
+      };
+    }
 
-      if (!values.length) return;
-      const bins = Number(controls.bins.value);
-      const minX = opts.minX ?? 0;
-      const maxX = opts.maxX ?? 100;
+    function clearCanvas(ctx, layout) {
+      ctx.clearRect(0, 0, layout.W, layout.H);
+      ctx.fillStyle = theme.canvasBg;
+      ctx.fillRect(0, 0, layout.W, layout.H);
+    }
+
+    function drawPlotFrame(ctx, layout) {
+      ctx.strokeStyle = theme.border;
+      ctx.strokeRect(layout.pad.l, layout.pad.t, layout.plotW, layout.plotH);
+    }
+
+    function drawAxisLabels(ctx, layout, minX, maxX) {
+      ctx.fillStyle = theme.axisText;
+      ctx.font = '11px "IBM Plex Sans", sans-serif';
+      ctx.fillText(String(minX.toFixed(0)), layout.pad.l, layout.H - 6);
+      ctx.fillText(String(maxX.toFixed(0)), layout.W - layout.pad.r - 24, layout.H - 6);
+    }
+
+    function drawEmptyCanvasMessage(ctx, layout, message) {
+      ctx.fillStyle = theme.axisText;
+      ctx.font = '13px "IBM Plex Sans", sans-serif';
+      ctx.fillText(message, layout.pad.l + 10, layout.pad.t + 22);
+    }
+
+    function drawHistogram(canvas, values, opts = {}) {
+      const ctx = canvas.getContext("2d");
+      const layout = getPlotLayout(canvas);
+      clearCanvas(ctx, layout);
+      drawPlotFrame(ctx, layout);
+      drawAxisLabels(ctx, layout, opts.minX ?? POPULATION_MIN, opts.maxX ?? POPULATION_MAX);
+
+      if (!values.length) {
+        if (opts.emptyMessage) {
+          drawEmptyCanvasMessage(ctx, layout, opts.emptyMessage);
+        }
+        return;
+      }
+
+      const bins = FIXED_HISTOGRAM_BINS;
+      const minX = opts.minX ?? POPULATION_MIN;
+      const maxX = opts.maxX ?? POPULATION_MAX;
       const hist = histogram(values, bins, minX, maxX);
       const maxCount = Math.max(...hist.counts, 1);
-      const plotW = W - pad.l - pad.r;
-      const plotH = H - pad.t - pad.b;
-      const bw = plotW / bins;
-
-      ctx.strokeStyle = '#cad2e8';
-      ctx.strokeRect(pad.l, pad.t, plotW, plotH);
+      const bw = layout.plotW / bins;
+      const stackMetrics = opts.matchStackWidth ? buildStackedBoxMetrics([], [], canvas, minX, maxX) : null;
+      const barWidth = stackMetrics ? stackMetrics.boxWidth : bw - 1.2;
+      const barInset = stackMetrics ? (bw - barWidth) / 2 : 0.6;
 
       hist.counts.forEach((c, i) => {
-        const h = (c / maxCount) * (plotH - 2);
-        const x = pad.l + i * bw;
-        const y = pad.t + plotH - h;
-        ctx.fillStyle = opts.barColor || '#91b4ff';
-        ctx.fillRect(x + 0.6, y, bw - 1.2, h);
+        const h = (c / maxCount) * (layout.plotH - 2);
+        const x = layout.pad.l + i * bw;
+        const y = layout.pad.t + layout.plotH - h;
+        ctx.fillStyle = opts.barColor || theme.populationBar;
+        ctx.fillRect(x + barInset, y, barWidth, h);
       });
 
       if (opts.showMarkers) {
-        const m = mean(values), med = median(values), s = sd(values);
-        drawMarker(ctx, pad, m, minX, maxX, '#2d6cdf', plotH);
-        drawMarker(ctx, pad, med, minX, maxX, '#7a3ec8', plotH);
-        drawMarker(ctx, pad, m - s, minX, maxX, '#d13f3f', plotH, true);
-        drawMarker(ctx, pad, m + s, minX, maxX, '#d13f3f', plotH, true);
+        const m = mean(values);
+        const med = median(values);
+        const s = sd(values);
+        drawMarker(ctx, layout, m, minX, maxX, theme.mean, false);
+        drawMarker(ctx, layout, med, minX, maxX, theme.median, false);
+        drawMarker(ctx, layout, m - s, minX, maxX, theme.spread, true);
+        drawMarker(ctx, layout, m + s, minX, maxX, theme.spread, true);
+        drawMarkerLabel(ctx, layout, m, minX, maxX, theme.mean, "Mean", 12);
+        drawMarkerLabel(ctx, layout, med, minX, maxX, theme.median, "Median", 30);
       }
 
       if (opts.fitNormal) {
         const mu = mean(values);
         const sig = Math.max(sd(values), 1e-9);
-        ctx.strokeStyle = '#111';
+        ctx.strokeStyle = theme.normalCurve;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         for (let i = 0; i < bins; i++) {
           const xVal = minX + (i + 0.5) * (maxX - minX) / bins;
           const density = (1 / (sig * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((xVal - mu) / sig) ** 2);
           const scaled = density * values.length * hist.width;
-          const y = pad.t + plotH - (scaled / maxCount) * (plotH - 2);
-          const x = pad.l + (i + 0.5) * bw;
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          const y = layout.pad.t + layout.plotH - (scaled / maxCount) * (layout.plotH - 2);
+          const x = layout.pad.l + (i + 0.5) * bw;
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
         }
         ctx.stroke();
         ctx.lineWidth = 1;
       }
-
-      ctx.fillStyle = '#5f6a89';
-      ctx.font = '11px sans-serif';
-      ctx.fillText(String(minX.toFixed(0)), pad.l, H - 6);
-      ctx.fillText(String(maxX.toFixed(0)), W - pad.r - 24, H - 6);
     }
 
-    function drawMarker(ctx, pad, val, minX, maxX, color, plotH, short = false) {
-      const plotW = ctx.canvas.width - pad.l - pad.r;
-      const x = pad.l + ((val - minX) / (maxX - minX)) * plotW;
+    function buildStackedBoxMetricsFromCounts(committedCounts, previewValues, canvas, minX = POPULATION_MIN, maxX = POPULATION_MAX) {
+      const layout = getPlotLayout(canvas);
+      const bins = FIXED_HISTOGRAM_BINS;
+      const counts = [...committedCounts];
+      const width = (maxX - minX) / bins;
+
+      accumulateHistogramCounts(previewValues, counts, minX, maxX);
+
+      const maxCount = Math.max(...counts, 0);
+      const totalCount = counts.reduce((sum, count) => sum + count, 0);
+      const columnWidth = layout.plotW / bins;
+      const maxVisibleRows = Math.max(1, Math.floor((layout.plotH - 8) / 4));
+      const groupSize = maxCount > 0 ? Math.max(1, Math.ceil(maxCount / maxVisibleRows)) : 1;
+      const renderCounts = counts.map((count) => Math.ceil(count / groupSize));
+      const maxRenderedCount = Math.max(...renderCounts, 0);
+      const rowPitch = maxRenderedCount > 0
+        ? Math.max(3, Math.min(14, (layout.plotH - 8) / maxRenderedCount))
+        : 12;
+      const boxHeight = Math.max(2, rowPitch - 1);
+      const boxWidth = Math.max(4, Math.min(columnWidth - 2, 14));
+
+      return {
+        layout,
+        bins,
+        counts,
+        totalCount,
+        columnWidth,
+        groupSize,
+        renderCounts,
+        rowPitch,
+        boxHeight,
+        boxWidth,
+        minX,
+        maxX
+      };
+    }
+
+    function buildStackedBoxMetrics(committedValues, previewValues, canvas, minX = POPULATION_MIN, maxX = POPULATION_MAX) {
+      const counts = createZeroCounts();
+      accumulateHistogramCounts(committedValues, counts, minX, maxX);
+      return buildStackedBoxMetricsFromCounts(counts, previewValues, canvas, minX, maxX);
+    }
+
+    function drawSampleStack(canvas, committedValues, previewValues = [], opts = {}) {
+      const ctx = canvas.getContext("2d");
+      const metrics = buildStackedBoxMetrics(committedValues, previewValues, canvas, opts.minX ?? POPULATION_MIN, opts.maxX ?? POPULATION_MAX);
+      const { layout, bins, totalCount, columnWidth, renderCounts, rowPitch, boxHeight, boxWidth, groupSize } = metrics;
+
+      clearCanvas(ctx, layout);
+      drawPlotFrame(ctx, layout);
+      drawAxisLabels(ctx, layout, opts.minX ?? POPULATION_MIN, opts.maxX ?? POPULATION_MAX);
+
+      if (!totalCount) {
+        if (opts.emptyMessage) {
+          drawEmptyCanvasMessage(ctx, layout, opts.emptyMessage);
+        }
+        return;
+      }
+
+      ctx.fillStyle = opts.boxColor || theme.sampleBar;
+      ctx.strokeStyle = opts.boxBorderColor || theme.sampleBoxBorder;
+      for (let i = 0; i < bins; i++) {
+        const renderedCount = renderCounts[i];
+        if (!renderedCount) {
+          continue;
+        }
+
+        const x = layout.pad.l + i * columnWidth + (columnWidth - boxWidth) / 2;
+        for (let row = 0; row < renderedCount; row++) {
+          const y = layout.pad.t + layout.plotH - (row + 1) * rowPitch;
+          ctx.fillRect(x, y, boxWidth, boxHeight);
+          ctx.strokeRect(x, y, boxWidth, boxHeight);
+        }
+      }
+
+      if (groupSize > 1) {
+        ctx.fillStyle = theme.axisText;
+        ctx.font = '11px "IBM Plex Sans", sans-serif';
+        ctx.fillText(`Stacks compressed to fit after many draws (~${groupSize} per box).`, layout.pad.l + 8, layout.pad.t + 14);
+      }
+    }
+
+    function drawSampleStackFromCounts(canvas, committedCounts, previewValues = [], opts = {}) {
+      const ctx = canvas.getContext("2d");
+      const metrics = buildStackedBoxMetricsFromCounts(committedCounts, previewValues, canvas, opts.minX ?? POPULATION_MIN, opts.maxX ?? POPULATION_MAX);
+      const { layout, bins, totalCount, columnWidth, renderCounts, rowPitch, boxHeight, boxWidth, groupSize } = metrics;
+
+      clearCanvas(ctx, layout);
+      drawPlotFrame(ctx, layout);
+      drawAxisLabels(ctx, layout, opts.minX ?? POPULATION_MIN, opts.maxX ?? POPULATION_MAX);
+
+      if (!totalCount) {
+        if (opts.emptyMessage) {
+          drawEmptyCanvasMessage(ctx, layout, opts.emptyMessage);
+        }
+        return;
+      }
+
+      ctx.fillStyle = opts.boxColor || theme.sampleBar;
+      ctx.strokeStyle = opts.boxBorderColor || theme.sampleBoxBorder;
+      for (let i = 0; i < bins; i++) {
+        const renderedCount = renderCounts[i];
+        if (!renderedCount) {
+          continue;
+        }
+
+        const x = layout.pad.l + i * columnWidth + (columnWidth - boxWidth) / 2;
+        for (let row = 0; row < renderedCount; row++) {
+          const y = layout.pad.t + layout.plotH - (row + 1) * rowPitch;
+          ctx.fillRect(x, y, boxWidth, boxHeight);
+          ctx.strokeRect(x, y, boxWidth, boxHeight);
+        }
+      }
+
+      if (groupSize > 1) {
+        ctx.fillStyle = theme.axisText;
+        ctx.font = '11px "IBM Plex Sans", sans-serif';
+        ctx.fillText(`Stacks compressed to fit after many draws (~${groupSize} per box).`, layout.pad.l + 8, layout.pad.t + 14);
+      }
+    }
+
+    function drawCustomPopulationEditor() {
+      const canvas = canvases.population;
+      const ctx = canvas.getContext("2d");
+      const layout = getPlotLayout(canvas);
+      clearCanvas(ctx, layout);
+      drawPlotFrame(ctx, layout);
+      drawAxisLabels(ctx, layout, POPULATION_MIN, POPULATION_MAX);
+
+      const displayMetrics = buildStackedBoxMetrics([], [], canvas, POPULATION_MIN, POPULATION_MAX);
+      const counts = Array(displayMetrics.bins).fill(0);
+      state.customPopulationWeights.forEach((count, index) => {
+        const displayIndex = Math.min(
+          displayMetrics.bins - 1,
+          Math.floor((index / CUSTOM_EDITOR_BINS) * displayMetrics.bins)
+        );
+        counts[displayIndex] += count;
+      });
+      const maxCount = Math.max(...counts, 1);
+
+      counts.forEach((count, index) => {
+        const h = (count / maxCount) * (layout.plotH - 2);
+        const x = layout.pad.l + index * displayMetrics.columnWidth + (displayMetrics.columnWidth - displayMetrics.boxWidth) / 2;
+        const y = layout.pad.t + layout.plotH - h;
+        ctx.fillStyle = theme.populationBar;
+        ctx.fillRect(x, y, displayMetrics.boxWidth, h);
+      });
+
+      if (state.populationValues.length) {
+        const m = mean(state.populationValues);
+        const med = median(state.populationValues);
+        const s = sd(state.populationValues);
+        drawMarker(ctx, layout, m, POPULATION_MIN, POPULATION_MAX, theme.mean, false);
+        drawMarker(ctx, layout, med, POPULATION_MIN, POPULATION_MAX, theme.median, false);
+        drawMarker(ctx, layout, m - s, POPULATION_MIN, POPULATION_MAX, theme.spread, true);
+        drawMarker(ctx, layout, m + s, POPULATION_MIN, POPULATION_MAX, theme.spread, true);
+        drawMarkerLabel(ctx, layout, m, POPULATION_MIN, POPULATION_MAX, theme.mean, "Mean", 12);
+        drawMarkerLabel(ctx, layout, med, POPULATION_MIN, POPULATION_MAX, theme.median, "Median", 30);
+      } else {
+        drawEmptyCanvasMessage(ctx, layout, "Draw inside the chart to build a custom population.");
+      }
+    }
+
+    function drawMarker(ctx, layout, val, minX, maxX, color, short = false) {
+      const x = layout.pad.l + ((val - minX) / (maxX - minX)) * layout.plotW;
       ctx.strokeStyle = color;
       ctx.beginPath();
-      ctx.moveTo(x, pad.t + (short ? plotH - 15 : 0));
-      ctx.lineTo(x, pad.t + plotH);
+      ctx.moveTo(x, layout.pad.t + (short ? layout.plotH - 15 : 0));
+      ctx.lineTo(x, layout.pad.t + layout.plotH);
       ctx.stroke();
     }
 
+    function drawMarkerLabel(ctx, layout, val, minX, maxX, color, label, yOffset) {
+      const rawX = layout.pad.l + ((val - minX) / (maxX - minX)) * layout.plotW;
+      ctx.save();
+      ctx.font = '12px "IBM Plex Sans", sans-serif';
+      const textWidth = ctx.measureText(label).width;
+      const paddingX = 6;
+      const boxWidth = textWidth + paddingX * 2;
+      const boxHeight = 18;
+      const clampedX = clamp(rawX, layout.pad.l + boxWidth / 2, layout.pad.l + layout.plotW - boxWidth / 2);
+      const x = clampedX - boxWidth / 2;
+      const y = layout.pad.t + yOffset - boxHeight / 2;
+
+      ctx.fillStyle = theme.markerLabelBg;
+      ctx.fillRect(x, y, boxWidth, boxHeight);
+      ctx.strokeStyle = color;
+      ctx.strokeRect(x, y, boxWidth, boxHeight);
+      ctx.fillStyle = color;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, clampedX, y + boxHeight / 2);
+      ctx.restore();
+    }
+
+    function drawPopulationSelectionOverlay(canvas, value) {
+      if (value == null) {
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
+      const layout = getPlotLayout(canvas);
+      const x = layout.pad.l + ((value - POPULATION_MIN) / (POPULATION_MAX - POPULATION_MIN)) * layout.plotW;
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(240, 93, 61, 0.9)";
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x, layout.pad.t);
+      ctx.lineTo(x, layout.pad.t + layout.plotH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(240, 93, 61, 0.95)";
+      ctx.beginPath();
+      ctx.arc(x, layout.pad.t + 18, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawIncomingSampleOverlay(canvas, committedCounts, previewValues, incomingSample) {
+      if (!incomingSample) {
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
+      const futurePreviewValues = [...previewValues, incomingSample.value];
+      const metrics = buildStackedBoxMetricsFromCounts(committedCounts, futurePreviewValues, canvas, POPULATION_MIN, POPULATION_MAX);
+      const { layout, bins, columnWidth, renderCounts, rowPitch, boxHeight, boxWidth } = metrics;
+      const eased = easeOutCubic(incomingSample.progress);
+      const width = (POPULATION_MAX - POPULATION_MIN) / bins;
+      const binIndex = Math.max(0, Math.min(bins - 1, Math.floor((incomingSample.value - POPULATION_MIN) / width)));
+      const renderedCount = Math.max(1, renderCounts[binIndex]);
+      const x = layout.pad.l + binIndex * columnWidth + (columnWidth - boxWidth) / 2;
+      const startY = layout.pad.t - boxHeight - 8;
+      const endY = layout.pad.t + layout.plotH - renderedCount * rowPitch;
+      const y = startY + (endY - startY) * eased;
+
+      ctx.save();
+      ctx.fillStyle = theme.sampleBar;
+      ctx.strokeStyle = theme.sampleBoxBorder;
+      ctx.fillRect(x, y, boxWidth, boxHeight);
+      ctx.strokeRect(x, y, boxWidth, boxHeight);
+      ctx.restore();
+    }
+
+    function drawSamplingDropOverlay(canvas, existingValues, dropState, minX, maxX) {
+      if (!dropState) {
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
+      const metrics = buildStackedBoxMetrics(existingValues, [dropState.value], canvas, minX, maxX);
+      const { layout, bins, columnWidth, renderCounts, rowPitch, boxHeight, boxWidth } = metrics;
+      const width = (maxX - minX) / bins;
+      const binIndex = Math.max(0, Math.min(bins - 1, Math.floor((dropState.value - minX) / width)));
+      const renderedCount = Math.max(1, renderCounts[binIndex]);
+      const x = layout.pad.l + binIndex * columnWidth + (columnWidth - boxWidth) / 2;
+      const startY = layout.pad.t - boxHeight - 8;
+      const endY = layout.pad.t + layout.plotH - renderedCount * rowPitch;
+      const y = startY + (endY - startY) * easeOutCubic(dropState.progress);
+
+      ctx.save();
+      ctx.fillStyle = theme.samplingBar;
+      ctx.strokeStyle = theme.samplingBoxBorder;
+      ctx.fillRect(x, y, boxWidth, boxHeight);
+      ctx.strokeRect(x, y, boxWidth, boxHeight);
+      ctx.restore();
+    }
+
+    function resetAnimationState() {
+      state.animation.previewSampleValues = null;
+      state.animation.highlightedPopulationValue = null;
+      state.animation.incomingSample = null;
+      state.animation.droppingStatistic = null;
+    }
+
+    function getCanvasPoint(event, canvas) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (event.clientX - rect.left) * (canvas.width / rect.width),
+        y: (event.clientY - rect.top) * (canvas.height / rect.height),
+      };
+    }
+
+    function getCustomEditorPoint(event) {
+      const point = getCanvasPoint(event, canvases.population);
+      const layout = getPlotLayout(canvases.population);
+      const xInside = point.x >= layout.pad.l && point.x <= layout.pad.l + layout.plotW;
+      const yInside = point.y >= layout.pad.t && point.y <= layout.pad.t + layout.plotH;
+      if (!xInside || !yInside) {
+        return null;
+      }
+
+      const clampedX = clamp(point.x, layout.pad.l, layout.pad.l + layout.plotW - 1);
+      const clampedY = clamp(point.y, layout.pad.t, layout.pad.t + layout.plotH);
+      return {
+        bin: clamp(Math.floor(((clampedX - layout.pad.l) / layout.plotW) * CUSTOM_EDITOR_BINS), 0, CUSTOM_EDITOR_BINS - 1),
+        value: clamp((layout.pad.t + layout.plotH - clampedY) / layout.plotH, 0, 1),
+      };
+    }
+
+    function applyCustomStroke(point) {
+      if (!point) {
+        return;
+      }
+
+      const previousPoint = state.customLastPoint ?? point;
+      const steps = Math.max(1, Math.abs(point.bin - previousPoint.bin));
+      for (let step = 0; step <= steps; step++) {
+        const t = steps === 0 ? 1 : step / steps;
+        const bin = Math.round(previousPoint.bin + (point.bin - previousPoint.bin) * t);
+        const value = previousPoint.value + (point.value - previousPoint.value) * t;
+        state.customPopulationWeights[bin] = value;
+      }
+
+      state.customLastPoint = point;
+      rebuildPopulationValues(true);
+      redraw();
+    }
+
+    function beginCustomDraw(event) {
+      if (!customModeActive() || state.animation.running) {
+        return;
+      }
+
+      const point = getCustomEditorPoint(event);
+      if (!point) {
+        return;
+      }
+
+      state.customDrawing = true;
+      state.customLastPoint = point;
+      if (canvases.population.setPointerCapture) {
+        canvases.population.setPointerCapture(event.pointerId);
+      }
+      applyCustomStroke(point);
+      event.preventDefault();
+    }
+
+    function continueCustomDraw(event) {
+      if (!state.customDrawing || !customModeActive()) {
+        return;
+      }
+      applyCustomStroke(getCustomEditorPoint(event));
+      event.preventDefault();
+    }
+
+    function endCustomDraw(event) {
+      if (!state.customDrawing) {
+        return;
+      }
+      state.customDrawing = false;
+      state.customLastPoint = null;
+      if (event && event.pointerId != null && canvases.population.hasPointerCapture && canvases.population.hasPointerCapture(event.pointerId)) {
+        canvases.population.releasePointerCapture(event.pointerId);
+      }
+    }
+
+    function updateCustomModeUI() {
+      const customActive = customModeActive();
+      const hasPopulation = state.populationValues.length > 0;
+
+      canvases.population.style.cursor = customActive && !state.animation.running ? "crosshair" : "default";
+
+      if (customActive) {
+        ui.customModeNote.textContent = hasPopulation
+          ? `Custom mode is active. Click and drag in the population chart to sculpt a strange distribution. Drag near the bottom to erase bars. ${controls.statisticType.value === "mean" ? "Mean is selected, so this is the clearest central-limit-theorem view." : "Switch Statistic to Mean for the clearest central-limit-theorem view."}`
+          : "Custom mode is active, but the population is empty. Click and drag in the population chart to add probability mass before sampling.";
+        ui.populationHint.textContent = "Custom mode: click and drag to shape the population. Spikes, gaps, and lopsided clusters all work here.";
+      } else {
+        ui.customModeNote.textContent = "Choose Custom drawn to sketch a strange population and test how the sampling distribution of the mean still becomes nearly normal.";
+        ui.populationHint.textContent = "Blue marks the mean, purple the median, and orange the sample-space spread around the mean.";
+      }
+    }
+
+    function updateActionButtons() {
+      const hasPopulation = state.populationValues.length > 0;
+      const locked = state.animation.running;
+      const atCapacity = getRemainingReplicationCapacity() <= 0;
+
+      [ui.animateBtn, ui.sample5Btn, ui.sample1000Btn, ui.sample10000Btn].forEach((button) => {
+        button.disabled = !hasPopulation || locked || atCapacity;
+      });
+      controls.populationType.disabled = locked;
+      controls.statisticType.disabled = locked;
+      controls.sampleSize.disabled = locked;
+    }
+
     function updatePopulationStats() {
-      ui.popMean.textContent = mean(state.populationValues).toFixed(3);
-      ui.popMedian.textContent = median(state.populationValues).toFixed(3);
-      ui.popSd.textContent = sd(state.populationValues).toFixed(3);
-      ui.reps.textContent = String(state.statReplications.length);
-      ui.samplingHint.textContent = `Statistic: ${controls.statisticType.options[controls.statisticType.selectedIndex].text}`;
+      const statisticLabel = controls.statisticType.options[controls.statisticType.selectedIndex].text;
+      const sampleSize = Number(controls.sampleSize.value);
+      const displayedStatReplications = getDisplayedStatReplications();
+
+      function setEquationDisplay(observedValues, populationSd, n, isMeanStatistic) {
+        const benchmarkSe = populationSd == null ? null : populationSd / Math.sqrt(n);
+        const repCount = observedValues.length;
+        const repCountDisplay = repCount.toLocaleString();
+        const lhs = isMeanStatistic ? "SE<sub>obs</sub>" : "SD<sub>obs</sub>";
+        const itemSymbol = isMeanStatistic ? "x&#772;<sub>i</sub>" : "t<sub>i</sub>";
+
+        ui.seEquationLabel.textContent = isMeanStatistic ? "Observed Standard Error" : "Observed Sampling SD";
+
+        if (!repCount) {
+          ui.seEquation.innerHTML = `
+            <div class="equation-row">
+              <span class="math-symbol">${lhs}</span>
+              <span>=</span>
+              <span class="math-root">
+                <span class="radical">&radic;</span>
+                <span class="radicand">
+                  <span class="math-frac">
+                    <span class="num">&Sigma; (${itemSymbol} - m)<sup>2</sup></span>
+                    <span class="den">R</span>
+                  </span>
+                </span>
+              </span>
+            </div>
+            <div class="equation-row">
+              <span>=</span>
+              <strong>-</strong>
+            </div>
+          `;
+          ui.seEquationNote.textContent = benchmarkSe == null
+            ? "This will update as replications accumulate."
+            : `Population benchmark: ${fmt(populationSd)} / sqrt(${n}) = ${fmt(benchmarkSe)}.`;
+          return;
+        }
+
+        const currentCenter = mean(observedValues);
+        const sumSquares = sumSquaredDeviations(observedValues, currentCenter);
+        const observedVariance = sumSquares / repCount;
+        const observedSd = Math.sqrt(observedVariance);
+
+        ui.seEquation.innerHTML = `
+          <div class="equation-row">
+            <span class="math-symbol">${lhs}</span>
+            <span>=</span>
+            <span class="math-root">
+              <span class="radical">&radic;</span>
+              <span class="radicand">
+                <span class="math-frac">
+                  <span class="num">&Sigma; (${itemSymbol} - m)<sup>2</sup></span>
+                  <span class="den">R</span>
+                </span>
+              </span>
+            </span>
+          </div>
+          <div class="equation-row">
+            <span>=</span>
+            <span class="math-root">
+              <span class="radical">&radic;</span>
+              <span class="radicand">
+                <span class="math-frac">
+                  <span class="num">${fmt(sumSquares)}</span>
+                  <span class="den">${repCount}</span>
+                </span>
+              </span>
+            </span>
+          </div>
+          <div class="equation-row">
+            <span>=</span>
+            <span class="math-root">
+              <span class="radical">&radic;</span>
+              <span class="radicand">${fmt(observedVariance)}</span>
+            </span>
+          </div>
+          <div class="equation-row">
+            <span>=</span>
+            <strong>${fmt(observedSd)}</strong>
+          </div>
+        `;
+
+        ui.seEquationNote.textContent = benchmarkSe == null
+          ? `Current sampling-distribution center m = ${fmt(currentCenter)} across ${repCountDisplay} replications.`
+          : `Current sampling-distribution center m = ${fmt(currentCenter)}. Population benchmark: ${fmt(populationSd)} / sqrt(${n}) = ${fmt(benchmarkSe)}.`;
+      }
+
+      if (!state.populationValues.length) {
+        ui.popMean.textContent = "-";
+        ui.popSd.textContent = "-";
+        ui.samplingMean.textContent = "-";
+        ui.samplingSd.textContent = "-";
+        ui.samplingHint.textContent = customModeActive()
+          ? `Replications: 0. Selected statistic: ${statisticLabel}. Draw a custom population to begin.`
+          : `Replications: 0. Selected statistic: ${statisticLabel}.`;
+        setEquationDisplay([], null, sampleSize, controls.statisticType.value === "mean");
+        return;
+      }
+
+      const populationMean = mean(state.populationValues);
+      const populationSd = sd(state.populationValues);
+      const samplingMean = displayedStatReplications.length ? mean(displayedStatReplications) : null;
+      const samplingSd = displayedStatReplications.length ? sd(displayedStatReplications) : null;
+      const replicationCountDisplay = displayedStatReplications.length.toLocaleString();
+      const atCapacity = getRemainingReplicationCapacity() <= 0;
+
+      ui.popMean.textContent = fmt(populationMean);
+      ui.popSd.textContent = fmt(populationSd);
+      ui.samplingMean.textContent = samplingMean == null ? "-" : fmt(samplingMean);
+      ui.samplingSd.textContent = samplingSd == null ? "-" : fmt(samplingSd);
+      ui.samplingHint.textContent = atCapacity
+        ? `Replications: ${replicationCountDisplay}. Selected statistic: ${statisticLabel}. Maximum of 2,000,000 reached.`
+        : `Replications: ${replicationCountDisplay}. Selected statistic: ${statisticLabel}.`;
+      setEquationDisplay(displayedStatReplications, populationSd, sampleSize, controls.statisticType.value === "mean");
     }
 
     function redraw() {
-      drawHistogram(canvases.population, state.populationValues, { showMarkers: true, barColor: '#c6d7ff' });
-      drawHistogram(canvases.sample, state.sampleValues, { barColor: '#9cddc7' });
-      drawHistogram(canvases.sampling, state.statReplications, {
-        minX: 0,
-        maxX: Math.max(100, ...state.statReplications, 100),
-        barColor: '#f6c18d',
-        fitNormal: state.fitNormal
+      const samplingMaxX = maxValueOrFloor(
+        state.statReplications,
+        POPULATION_MAX,
+        state.animation.droppingStatistic?.value ?? null
+      );
+
+      if (customModeActive()) {
+        drawCustomPopulationEditor();
+      } else {
+        drawHistogram(canvases.population, state.populationValues, {
+          showMarkers: true,
+          barColor: theme.populationBar,
+          matchStackWidth: true
+        });
+      }
+      drawPopulationSelectionOverlay(canvases.population, state.animation.highlightedPopulationValue);
+
+      drawSampleStackFromCounts(canvases.sample, state.sampleStackCounts, state.animation.previewSampleValues ?? [], {
+        boxColor: theme.sampleBar,
+        emptyMessage: "Run a sample to see the current sample appear here as little boxes."
       });
-      drawHistogram(canvases.meanSampling, state.meanReplications, {
-        minX: 0,
-        maxX: 100,
-        barColor: '#d2b7f8'
+      drawIncomingSampleOverlay(
+        canvases.sample,
+        state.sampleStackCounts,
+        state.animation.previewSampleValues ?? [],
+        state.animation.incomingSample
+      );
+      drawSampleStack(canvases.sampling, state.statReplications, [], {
+        minX: POPULATION_MIN,
+        maxX: samplingMaxX,
+        boxColor: theme.samplingBar,
+        boxBorderColor: theme.samplingBoxBorder,
+        emptyMessage: "Each sample contributes one selected-statistic box to the stack."
       });
+      drawSamplingDropOverlay(
+        canvases.sampling,
+        state.statReplications,
+        state.animation.droppingStatistic,
+        POPULATION_MIN,
+        samplingMaxX
+      );
+      updateCustomModeUI();
+      updateActionButtons();
       updatePopulationStats();
     }
 
-    function resetSimulation() {
-      state.populationValues = generatePopulation(controls.populationType.value);
+    function commitSampleResult(sampleValues, statisticValue) {
+      state.sampleValues = [...sampleValues];
+      state.sampleStackCounts = createZeroCounts();
+      accumulateHistogramCounts(sampleValues, state.sampleStackCounts);
+      state.statReplications.push(statisticValue);
+    }
+
+    async function animateSampleDraw(sampleValues, statisticValue) {
+      const delay = FIXED_ANIMATION_DELAY_MS;
+      const sampleStepDuration = Math.max(180, Math.min(420, delay > 0 ? delay * 14 : 180));
+      const betweenPointPause = delay > 0 ? Math.max(70, Math.min(180, delay * 4)) : 100;
+      const dropDuration = Math.max(320, Math.min(760, sampleStepDuration * 1.9));
+
+      state.animation.running = true;
       state.sampleValues = [];
-      state.statReplications = [];
-      state.meanReplications = [];
+      state.sampleStackCounts = createZeroCounts();
+      resetAnimationState();
+      state.animation.previewSampleValues = [];
       redraw();
+
+      try {
+        for (const value of sampleValues) {
+          state.animation.highlightedPopulationValue = value;
+          state.animation.incomingSample = { value, progress: 0 };
+          await animateTransition(sampleStepDuration, (progress) => {
+            state.animation.incomingSample.progress = progress;
+            redraw();
+          });
+          state.animation.previewSampleValues.push(value);
+          state.animation.incomingSample = null;
+          redraw();
+          await sleep(betweenPointPause);
+        }
+
+        state.sampleValues = [...sampleValues];
+        state.animation.highlightedPopulationValue = null;
+        state.animation.droppingStatistic = { value: statisticValue, progress: 0 };
+        redraw();
+
+        await animateTransition(dropDuration, (progress) => {
+          state.animation.droppingStatistic.progress = progress;
+          redraw();
+        });
+
+        commitSampleResult(sampleValues, statisticValue);
+      } finally {
+        state.animation.running = false;
+        resetAnimationState();
+        redraw();
+      }
+    }
+
+    function resetSimulation() {
+      rebuildPopulationValues(true);
+      resetAnimationState();
+      state.animation.running = false;
+      redraw();
+    }
+
+    async function runBulkSamples(count, progressChunkSize = count) {
+      const actualCount = Math.min(count, getRemainingReplicationCapacity());
+      if (!actualCount) {
+        return 0;
+      }
+
+      const n = Number(controls.sampleSize.value);
+      const safeProgressChunkSize = Math.max(1, progressChunkSize);
+      for (let i = 0; i < actualCount; i++) {
+        const s = sampleFromPopulation(n);
+        const statisticValue = computeStatistic(s);
+        commitSampleResult(s, statisticValue);
+        if ((i + 1) % BULK_RUN_YIELD_EVERY === 0) {
+          await sleep(0);
+        }
+        if ((i + 1) % safeProgressChunkSize === 0 || i + 1 === actualCount) {
+          redraw();
+          await sleep(0);
+        }
+      }
+      return actualCount;
     }
 
     async function runSamples(count, animated = false) {
-      const n = Number(controls.sampleSize.value);
-      const delay = Number(controls.speed.value);
-      for (let i = 0; i < count; i++) {
-        const s = sampleFromPopulation(n);
-        state.sampleValues = s;
-        state.statReplications.push(computeStatistic(s));
-        state.meanReplications.push(mean(s));
-        if (animated) {
-          redraw();
-          if (delay > 0) await new Promise(r => setTimeout(r, delay));
-        }
+      if (!state.populationValues.length) {
+        return;
       }
+
+      const actualCount = Math.min(count, getRemainingReplicationCapacity());
+      if (!actualCount) {
+        redraw();
+        return;
+      }
+
+      if (animated) {
+        const n = Number(controls.sampleSize.value);
+        for (let i = 0; i < actualCount; i++) {
+          const s = sampleFromPopulation(n);
+          const statisticValue = computeStatistic(s);
+          await animateSampleDraw(s, statisticValue);
+        }
+        redraw();
+        return;
+      }
+
+      state.animation.running = true;
       redraw();
+      try {
+        await runBulkSamples(actualCount);
+      } finally {
+        state.animation.running = false;
+        redraw();
+      }
     }
 
-    document.getElementById('animateBtn').addEventListener('click', () => runSamples(1, true));
-    document.getElementById('sample5Btn').addEventListener('click', () => runSamples(5, false));
-    document.getElementById('sample1000Btn').addEventListener('click', () => runSamples(1000, false));
-    document.getElementById('sample10000Btn').addEventListener('click', () => runSamples(10000, false));
-    document.getElementById('resetBtn').addEventListener('click', resetSimulation);
-    document.getElementById('fitNormalBtn').addEventListener('click', () => {
-      state.fitNormal = !state.fitNormal;
-      ui.fitNormalBtn.textContent = `Fit normal: ${state.fitNormal ? 'On' : 'Off'}`;
-      redraw();
+    ui.animateBtn.addEventListener("click", () => runSamples(1, true));
+    ui.sample5Btn.addEventListener("click", () => runSamples(5, false));
+    ui.sample1000Btn.addEventListener("click", () => runSamples(10000, false));
+    ui.sample10000Btn.addEventListener("click", () => runSamples(100000, false));
+
+    ["populationType", "statisticType", "sampleSize"].forEach((id) => {
+      controls[id].addEventListener("change", () => {
+        if (id === "populationType") {
+          if (controls.populationType.value === "custom") {
+            state.customPopulationWeights = createCustomStarterWeights();
+          }
+          resetSimulation();
+        } else {
+          resetVisualizationState();
+        }
+      });
     });
 
-    ['populationType', 'statisticType', 'sampleSize', 'bins'].forEach(id => {
-      controls[id].addEventListener('change', () => {
-        if (id === 'populationType') resetSimulation(); else redraw();
-      });
+    canvases.population.addEventListener("pointerdown", beginCustomDraw);
+    canvases.population.addEventListener("pointermove", continueCustomDraw);
+    canvases.population.addEventListener("pointerup", endCustomDraw);
+    canvases.population.addEventListener("pointercancel", endCustomDraw);
+    canvases.population.addEventListener("pointerleave", (event) => {
+      if (state.customDrawing && event.buttons === 0) {
+        endCustomDraw(event);
+      }
     });
 
     resetSimulation();
