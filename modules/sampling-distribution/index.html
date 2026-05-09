@@ -537,12 +537,7 @@
                 <span>Statistic</span>
                 <select id="statisticType">
                   <option value="mean">Mean</option>
-                  <option value="median">Median</option>
-                  <option value="sd">SD (N denominator)</option>
-                  <option value="variance">Variance (N denominator)</option>
-                  <option value="varianceUnbiased">Variance (N-1 denominator)</option>
-                  <option value="mad">Mean absolute deviation</option>
-                  <option value="range">Range</option>
+                  <option value="variance">Variance</option>
                 </select>
               </label>
               <label>
@@ -929,7 +924,7 @@
         case "sd":
           return Math.sqrt(variance(values, false));
         case "variance":
-          return variance(values, false);
+          return variance(values, true);
         case "varianceUnbiased":
           return variance(values, true);
         case "mad": {
