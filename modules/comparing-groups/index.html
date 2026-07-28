@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Comparing Groups Lab | BUS-2150</title>
+  <meta name="description" content="Compare two business groups with the matching procedure, or open the one-way ANOVA mode to study several means and follow-up comparisons." />
+  <link rel="canonical" href="https://tools.benhartlage.com/comparing-groups/" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to activity</a>
+  <div class="shell">
+    <header class="topbar">
+      <a class="return" href="https://tools.benhartlage.com/">← Return to all tools</a>
+      <p class="privacy">No sign-in · no analytics · no saved or transmitted data</p>
+    </header>
+    <section class="hero">
+      <div><p class="eyebrow">Chapter 9 and Chapter 12 · Difference, uncertainty, decision</p><h1>Comparing Groups Lab</h1></div>
+      <p class="lede">Compare two business groups with the matching procedure, or open the one-way ANOVA mode to study several means and follow-up comparisons.</p>
+    </section>
+    <div class="workflow" aria-label="Learning workflow">
+      <div class="step"><strong>1</strong> Predict</div>
+      <div class="step"><strong>2</strong> Explore</div>
+      <div class="step"><strong>3</strong> Explain</div>
+    </div>
+    <main id="main"><div class="grid">
+      <div class="stack">
+        <section class="panel">
+          <h2 id="setupTitle">Procedure setup</h2>
+          <label>Comparison<select id="mode"><option value="prop">Two independent proportions</option><option value="means">Two independent means</option><option value="paired">Paired means</option><option value="variance">Two variances (F)</option><option value="anova">One-way ANOVA</option></select></label>
+          <div id="inputs" class="fields" style="margin-top:1rem"></div>
+          <label style="margin-top:.8rem">Significance level<input id="alpha" type="number" min=".001" max=".2" step=".001" value=".05"></label>
+          <div class="button-row"><button id="run" type="button">Compare groups</button><button id="reset" class="secondary" type="button">Restore example</button></div>
+        </section>
+        <section class="panel">
+          <h2>Assumption checkpoint</h2>
+          <div id="assumptions" class="result warning" aria-live="polite"></div>
+        </section>
+      </div>
+      <div class="stack">
+        <section class="panel">
+          <h2>Comparison readout</h2>
+          <div class="metric-grid">
+            <div class="metric"><span>Estimated difference</span><strong id="difference">—</strong></div>
+            <div class="metric"><span>Test statistic</span><strong id="stat">—</strong></div>
+            <div class="metric"><span>p-value</span><strong id="pvalue">—</strong></div>
+          </div>
+          <div id="result" class="result" style="margin-top:1rem" aria-live="polite"></div>
+          <div id="followup" class="table-wrap" style="margin-top:1rem"></div>
+        </section>
+        <section class="panel">
+          <h2>Interpret before recommending</h2>
+          <p class="prompt"><strong>Canvas focus question:</strong> Which comparison is supported, how large is it in business units, and what design or assumption limits the recommendation?</p>
+          <p class="callout"><strong>Biblical/Ethical Stewardship and Integrity:</strong> Do not hide an inconvenient group result, overstate causation, or treat people as mere averages. Report material differences with humility and explain uncertainty.</p>
+        </section>
+      </div>
+    </div></main>
+    <footer class="footer">
+      <p><strong>Accessible fallback:</strong> Print this page or use your browser’s Save as PDF command. Your instructor can provide the equivalent static worksheet and tables.</p>
+      <p><strong>Course use:</strong> Record the requested response in Canvas. This tool does not submit or retain answers.</p>
+    </footer>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

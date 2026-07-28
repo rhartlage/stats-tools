@@ -16,12 +16,6 @@
   />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://tools.benhartlage.com/sampling-distribution/" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
-    rel="stylesheet"
-  />
   <style>
     :root {
       color-scheme: light;
@@ -58,7 +52,7 @@
     }
 
     body {
-      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(240, 93, 61, 0.12), transparent 28%),
@@ -67,8 +61,30 @@
     }
 
     button,
+    input,
     select {
       font: inherit;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 30;
+      left: 16px;
+      top: -80px;
+      padding: 12px 16px;
+      color: #000;
+      background: #fff;
+      border: 2px solid #000;
+    }
+
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    .privacy-note {
+      margin: -12px 0 18px;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
     }
 
     .page-shell {
@@ -99,7 +115,7 @@
     .card-head h3,
     .chart-card h3 {
       margin: 0;
-      font-family: "Space Grotesk", "Avenir Next", sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
     }
 
     .hero h1 {
@@ -115,6 +131,16 @@
       font-size: 1.02rem;
       line-height: 1.6;
       color: var(--ink-soft);
+    }
+
+    .practice-feedback {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-left: 5px solid var(--teal);
+      border-radius: 12px;
+      background: var(--teal-soft);
+      color: var(--ink-soft);
+      line-height: 1.5;
     }
 
     .workspace {
@@ -488,9 +514,26 @@
         font-size: clamp(2rem, 11vw, 3.25rem);
       }
     }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .return-link-button,
+      .action-grid,
+      .privacy-note {
+        display: none;
+      }
+
+      .panel {
+        box-shadow: none;
+      }
+    }
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#simulator">Skip to simulator</a>
   <div class="page-shell">
     <header class="hero">
       <div>
@@ -503,7 +546,9 @@
       </p>
     </header>
 
-    <main class="workspace">
+    <p class="privacy-note">No sign-in, analytics, storage, external fonts, or transmitted student data.</p>
+
+    <main id="simulator" class="workspace">
       <div class="control-column">
         <div class="button-row">
           <a
@@ -556,11 +601,19 @@
                   <option>30</option>
                 </select>
               </label>
+              <label>
+                <span>Simulation seed</span>
+                <input id="simulationSeed" type="number" min="1" max="2147483646" value="2150" />
+              </label>
             </div>
 
             <p class="live-note" id="customModeNote">
               Choose Custom drawn to sculpt a strange population directly on the population chart.
             </p>
+            <div class="button-row">
+              <button id="rerunSeedBtn" class="button button-secondary" type="button">Restart this seed</button>
+              <button id="nextSeedBtn" class="button button-secondary" type="button">Use next seed</button>
+            </div>
           </section>
 
           <section class="card accent-card">
@@ -613,6 +666,46 @@
               <p class="equation-note" id="seEquationNote">This will update as replications accumulate.</p>
             </div>
           </section>
+
+          <section class="card">
+            <div class="card-head compact">
+              <div>
+                <h3>Predict, then check</h3>
+                <p>Suppose the population spread stays fixed and sample size rises from 5 to 30.</p>
+              </div>
+            </div>
+            <label>
+              <span>What should happen to the standard error of the sample mean?</span>
+              <select id="sePrediction">
+                <option value="">Choose a prediction</option>
+                <option value="increase">It should increase</option>
+                <option value="same">It should stay the same</option>
+                <option value="decrease">It should decrease</option>
+              </select>
+            </label>
+            <div class="button-row">
+              <button id="checkPredictionBtn" class="button button-primary" type="button">Check prediction</button>
+            </div>
+            <div id="predictionFeedback" class="practice-feedback" role="status" aria-live="polite">
+              Make a prediction before running the larger sample.
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head compact">
+              <div>
+                <h3>Biblical/Ethical Stewardship and Integrity</h3>
+                <p>
+                  A convenient sample can look persuasive while misrepresenting the population.
+                  Truthful communication identifies how the sample was obtained, distinguishes
+                  sampling variability from bias, and avoids certainty that the evidence cannot support.
+                </p>
+              </div>
+            </div>
+            <p class="live-note">
+              Canvas focus: explain one way a stable sampling distribution could still lead to a poor business decision.
+            </p>
+          </section>
         </section>
       </div>
 
@@ -633,20 +726,33 @@
           <article class="chart-card">
             <h3>Population distribution</h3>
             <p class="hint" id="populationHint">Blue marks the mean, purple the median, and orange the sample-space spread around the mean.</p>
-            <canvas id="populationCanvas" width="560" height="260"></canvas>
+            <canvas id="populationCanvas" width="560" height="260" role="img" aria-label="Population distribution; numerical mean and standard deviation appear in the live readout"></canvas>
           </article>
 
           <article class="chart-card">
             <h3>Current sample draw</h3>
             <p class="hint">This panel resets on each draw so students can focus on the current sample only.</p>
-            <canvas id="sampleCanvas" width="560" height="260"></canvas>
+            <canvas id="sampleCanvas" width="560" height="260" role="img" aria-label="Current sample distribution; current values contribute to the live readout"></canvas>
           </article>
 
           <article class="chart-card">
             <h3>Sampling distribution of selected statistic</h3>
             <p class="hint">Every sample adds one new statistic box to this growing stack.</p>
-            <canvas id="samplingCanvas" width="560" height="260"></canvas>
+            <canvas id="samplingCanvas" width="560" height="260" role="img" aria-label="Sampling distribution; numerical center and standard error appear in the live readout"></canvas>
           </article>
+        </section>
+
+        <section class="card">
+          <div class="card-head compact">
+            <div>
+              <h3>Static and accessible fallback</h3>
+              <p>
+                The live readout states the numerical results represented by each canvas.
+                Print this page or use Save as PDF; your instructor can provide a static
+                sampling-distribution worksheet with the same starting seed.
+              </p>
+            </div>
+          </div>
         </section>
       </section>
     </main>
@@ -677,6 +783,25 @@
     const FIXED_ANIMATION_DELAY_MS = 20;
     const BULK_RUN_YIELD_EVERY = 10000;
     const MAX_REPLICATIONS = 2000000;
+    let randomSource = () => 0.5;
+
+    function seededRandom(seed) {
+      let stateValue = seed >>> 0;
+      return () => {
+        stateValue += 0x6d2b79f5;
+        let t = stateValue;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function resetRandomSource() {
+      const seedInput = document.getElementById("simulationSeed");
+      const seed = Math.max(1, Math.floor(Number(seedInput.value) || 2150));
+      seedInput.value = String(seed);
+      randomSource = seededRandom(seed);
+    }
 
     function createZeroCounts(binCount = FIXED_HISTOGRAM_BINS) {
       return Array(binCount).fill(0);
@@ -766,8 +891,8 @@
     }
 
     function randNormal(mean = 50, sd = 10) {
-      const u1 = Math.random() || 1e-12;
-      const u2 = Math.random();
+      const u1 = randomSource() || 1e-12;
+      const u2 = randomSource();
       const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
       return mean + z * sd;
     }
@@ -778,13 +903,13 @@
         let v;
         switch (type) {
           case "uniform":
-            v = 20 + Math.random() * 60;
+            v = 20 + randomSource() * 60;
             break;
           case "skewed":
-            v = 20 + (-Math.log(1 - Math.random())) * 12;
+            v = 20 + (-Math.log(1 - randomSource())) * 12;
             break;
           case "bimodal":
-            v = Math.random() < 0.5 ? randNormal(38, 7) : randNormal(64, 6);
+            v = randomSource() < 0.5 ? randNormal(38, 7) : randNormal(64, 6);
             break;
           default:
             v = randNormal(50, 10);
@@ -920,7 +1045,7 @@
     function sampleFromPopulation(k) {
       const out = [];
       for (let i = 0; i < k; i++) {
-        out.push(state.populationValues[(Math.random() * state.populationValues.length) | 0]);
+        out.push(state.populationValues[(randomSource() * state.populationValues.length) | 0]);
       }
       return out;
     }
@@ -982,14 +1107,14 @@
 
     function drawAxisLabels(ctx, layout, minX, maxX) {
       ctx.fillStyle = theme.axisText;
-      ctx.font = '11px "IBM Plex Sans", sans-serif';
+      ctx.font = '11px "Segoe UI", Arial, sans-serif';
       ctx.fillText(String(minX.toFixed(0)), layout.pad.l, layout.H - 6);
       ctx.fillText(String(maxX.toFixed(0)), layout.W - layout.pad.r - 24, layout.H - 6);
     }
 
     function drawEmptyCanvasMessage(ctx, layout, message) {
       ctx.fillStyle = theme.axisText;
-      ctx.font = '13px "IBM Plex Sans", sans-serif';
+      ctx.font = '13px "Segoe UI", Arial, sans-serif';
       ctx.fillText(message, layout.pad.l + 10, layout.pad.t + 22);
     }
 
@@ -1137,7 +1262,7 @@
 
       if (groupSize > 1) {
         ctx.fillStyle = theme.axisText;
-        ctx.font = '11px "IBM Plex Sans", sans-serif';
+        ctx.font = '11px "Segoe UI", Arial, sans-serif';
         ctx.fillText(`Stacks compressed to fit after many draws (~${groupSize} per box).`, layout.pad.l + 8, layout.pad.t + 14);
       }
     }
@@ -1176,7 +1301,7 @@
 
       if (groupSize > 1) {
         ctx.fillStyle = theme.axisText;
-        ctx.font = '11px "IBM Plex Sans", sans-serif';
+        ctx.font = '11px "Segoe UI", Arial, sans-serif';
         ctx.fillText(`Stacks compressed to fit after many draws (~${groupSize} per box).`, layout.pad.l + 8, layout.pad.t + 14);
       }
     }
@@ -1235,7 +1360,7 @@
     function drawMarkerLabel(ctx, layout, val, minX, maxX, color, label, yOffset) {
       const rawX = layout.pad.l + ((val - minX) / (maxX - minX)) * layout.plotW;
       ctx.save();
-      ctx.font = '12px "IBM Plex Sans", sans-serif';
+      ctx.font = '12px "Segoe UI", Arial, sans-serif';
       const textWidth = ctx.measureText(label).width;
       const paddingX = 6;
       const boxWidth = textWidth + paddingX * 2;
@@ -1666,6 +1791,7 @@
     }
 
     function resetSimulation() {
+      resetRandomSource();
       rebuildPopulationValues(true);
       resetAnimationState();
       state.animation.running = false;
@@ -1731,6 +1857,23 @@
     ui.sample5Btn.addEventListener("click", () => runSamples(5, false));
     ui.sample1000Btn.addEventListener("click", () => runSamples(10000, false));
     ui.sample10000Btn.addEventListener("click", () => runSamples(100000, false));
+    document.getElementById("rerunSeedBtn").addEventListener("click", resetSimulation);
+    document.getElementById("nextSeedBtn").addEventListener("click", () => {
+      const seedInput = document.getElementById("simulationSeed");
+      seedInput.value = String((Number(seedInput.value) || 2150) + 1);
+      resetSimulation();
+    });
+    document.getElementById("checkPredictionBtn").addEventListener("click", () => {
+      const prediction = document.getElementById("sePrediction").value;
+      const feedback = document.getElementById("predictionFeedback");
+      if (!prediction) {
+        feedback.textContent = "Choose a prediction before checking.";
+      } else if (prediction === "decrease") {
+        feedback.textContent = "Correct. For sample means, standard error is population SD divided by the square root of n, so a larger n produces a smaller standard error.";
+      } else {
+        feedback.textContent = "Reconsider the square-root rule: standard error equals population SD divided by the square root of n. Increasing n makes that denominator larger.";
+      }
+    });
 
     ["populationType", "statisticType", "sampleSize"].forEach((id) => {
       controls[id].addEventListener("change", () => {

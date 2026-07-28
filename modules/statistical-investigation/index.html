@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Statistical Investigation Studio | BUS-2150</title>
+  <meta name="description" content="Practice the full investigation cycle: clarify the decision, audit data, choose an analysis, diagnose limitations, and communicate a reproducible recommendation." />
+  <link rel="canonical" href="https://tools.benhartlage.com/statistical-investigation/" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to activity</a>
+  <div class="shell">
+    <header class="topbar">
+      <a class="return" href="https://tools.benhartlage.com/">← Return to all tools</a>
+      <p class="privacy">No sign-in · no analytics · no saved or transmitted data</p>
+    </header>
+    <section class="hero">
+      <div><p class="eyebrow">Chapters 1–12 · Evidence workflow</p><h1>Statistical Investigation Studio</h1></div>
+      <p class="lede">Practice the full investigation cycle: clarify the decision, audit data, choose an analysis, diagnose limitations, and communicate a reproducible recommendation.</p>
+    </section>
+    <div class="workflow" aria-label="Learning workflow">
+      <div class="step"><strong>1</strong> Predict</div>
+      <div class="step"><strong>2</strong> Explore</div>
+      <div class="step"><strong>3</strong> Explain</div>
+    </div>
+    <main id="main"><div class="grid">
+      <div class="stack">
+        <section class="panel">
+          <p class="kicker">Reproducible case</p>
+          <h2>Investigation brief</h2>
+          <label>Case seed<input id="seed" type="number" min="1" max="9999" value="2150"></label>
+          <div class="button-row"><button id="load" type="button">Load this case</button><button id="next" class="secondary" type="button">Next case</button></div>
+          <p id="case" class="scenario"></p>
+          <p><span id="domain" class="tag"></span></p>
+        </section>
+        <section class="panel">
+          <h2>Evidence log</h2>
+          <label>Decision question<textarea id="question"></textarea></label>
+          <label style="margin-top:.8rem">Planned analysis<select id="method"><option value="">Choose one</option><option>Descriptive statistics and graph</option><option>One-population interval/test</option><option>Compare two groups</option><option>Chi-square association</option><option>Simple linear regression</option><option>One-way ANOVA</option></select></label>
+          <label style="margin-top:.8rem">One limitation or diagnostic<textarea id="limit"></textarea></label>
+        </section>
+      </div>
+      <div class="stack">
+        <section class="panel">
+          <h2>Three hidden challenges</h2>
+          <p class="panel-copy">Each project dataset contains a data-quality issue, a model/assumption issue, and an interpretation/stewardship issue. Diagnose this practice case.</p>
+          <fieldset><legend>Data-quality challenge</legend><div id="dataOptions" class="choice-list"></div></fieldset>
+          <fieldset style="margin-top:1rem"><legend>Model or assumption challenge</legend><div id="modelOptions" class="choice-list"></div></fieldset>
+          <fieldset style="margin-top:1rem"><legend>Interpretation challenge</legend><div id="storyOptions" class="choice-list"></div></fieldset>
+          <div class="button-row"><button id="check" type="button">Audit investigation</button></div>
+        </section>
+        <section id="feedback" class="panel" aria-live="polite"></section>
+        <section class="panel">
+          <h2>Reproducible handoff</h2>
+          <ol>
+            <li>Keep the raw-data sheet immutable.</li>
+            <li>Record exclusions and transformations in the analysis log.</li>
+            <li>Make every table and chart traceable to a calculation.</li>
+            <li>Separate the statistical result, business judgment, and Biblical/Ethical reflection.</li>
+          </ol>
+          <p class="prompt"><strong>Canvas focus question:</strong> What evidence would cause you to reverse your recommendation?</p>
+        </section>
+      </div>
+    </div></main>
+    <footer class="footer">
+      <p><strong>Accessible fallback:</strong> Print this page or use your browser’s Save as PDF command. Your instructor can provide the equivalent static worksheet and tables.</p>
+      <p><strong>Course use:</strong> Record the requested response in Canvas. This tool does not submit or retain answers.</p>
+    </footer>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inference & Business Decision Lab | BUS-2150</title>
+  <meta name="description" content="Connect a confidence interval and hypothesis test to the same business question, then separate statistical evidence from the decision and its consequences." />
+  <link rel="canonical" href="https://tools.benhartlage.com/inference-decision/" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to activity</a>
+  <div class="shell">
+    <header class="topbar">
+      <a class="return" href="https://tools.benhartlage.com/">← Return to all tools</a>
+      <p class="privacy">No sign-in · no analytics · no saved or transmitted data</p>
+    </header>
+    <section class="hero">
+      <div><p class="eyebrow">Chapters 7–8 · Estimate, test, decide</p><h1>Inference & Business Decision Lab</h1></div>
+      <p class="lede">Connect a confidence interval and hypothesis test to the same business question, then separate statistical evidence from the decision and its consequences.</p>
+    </section>
+    <div class="workflow" aria-label="Learning workflow">
+      <div class="step"><strong>1</strong> Predict</div>
+      <div class="step"><strong>2</strong> Explore</div>
+      <div class="step"><strong>3</strong> Explain</div>
+    </div>
+    <main id="main"><div class="grid">
+      <div class="stack">
+        <section class="panel">
+          <h2>Choose the procedure</h2>
+          <label for="mode">One-population setting<select id="mode"><option value="prop">Proportion (z)</option><option value="mean">Mean (t)</option><option value="variance">Variance (chi-square)</option></select></label>
+          <div id="inputs" class="fields" style="margin-top:1rem"></div>
+          <div class="fields" style="margin-top:.8rem">
+            <label>Significance level<input id="alpha" type="number" min=".001" max=".2" step=".001" value=".05"></label>
+            <label>Claim direction<select id="direction"><option value="two">Different from</option><option value="greater">Greater than</option><option value="less">Less than</option></select></label>
+          </div>
+          <div class="button-row"><button id="analyze" type="button">Analyze evidence</button><button id="reset" class="secondary" type="button">Restore starting case</button></div>
+        </section>
+        <section class="panel">
+          <h2>Decision threshold</h2>
+          <label>Minimum practically important effect<input id="practical" type="number" min="0" step=".01" value=".05"><small>Use outcome units (or proportion points) to define what matters operationally.</small></label>
+        </section>
+      </div>
+      <div class="stack">
+        <section class="panel">
+          <h2>Evidence readout</h2>
+          <div class="metric-grid">
+            <div class="metric"><span>Estimate</span><strong id="estimate">—</strong></div>
+            <div class="metric"><span>Test statistic</span><strong id="stat">—</strong></div>
+            <div class="metric"><span>p-value</span><strong id="pvalue">—</strong></div>
+          </div>
+          <div id="interval" class="result" style="margin-top:1rem" aria-live="polite"></div>
+        </section>
+        <section class="panel">
+          <h2>From evidence to action</h2>
+          <div id="decision" class="result" aria-live="polite"></div>
+          <p class="prompt"><strong>Canvas focus question:</strong> State the statistical conclusion, practical implication, and one limitation as three separate sentences.</p>
+        </section>
+        <section class="panel">
+          <h2>Biblical/Ethical Stewardship and Integrity</h2>
+          <p class="callout">A small p-value does not license an exaggerated claim, and a large p-value does not prove no effect. Communicate uncertainty truthfully, distinguish evidence from judgment, and consider who bears the cost of a mistaken decision.</p>
+        </section>
+      </div>
+    </div></main>
+    <footer class="footer">
+      <p><strong>Accessible fallback:</strong> Print this page or use your browser’s Save as PDF command. Your instructor can provide the equivalent static worksheet and tables.</p>
+      <p><strong>Course use:</strong> Record the requested response in Canvas. This tool does not submit or retain answers.</p>
+    </footer>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>
