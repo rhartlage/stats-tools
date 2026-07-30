@@ -11,6 +11,7 @@ for in-class exploration followed by a short individual response in Canvas.
 - `modules/comparing-groups/`
 - `modules/comparing-groups/?lab=anova`
 - `modules/categorical-risk/`
+- `modules/categorical-risk/?lab=gof`
 - `modules/statistical-investigation/`
 
 Normal Area Explorer and Linear Regression Studio remain canonical in their own

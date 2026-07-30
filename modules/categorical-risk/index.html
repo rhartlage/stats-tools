@@ -17,26 +17,64 @@
     </header>
     <section class="hero">
       <div><p class="eyebrow">Chapter 11 · Counts, association, risk</p><h1>Categorical Risk Lab</h1></div>
-      <p class="lede">Test categorical patterns with chi-square, inspect which cells drive the result, and translate association into transparent business risk language.</p>
+      <p id="modeLede" class="lede">Test categorical patterns with chi-square, inspect which cells drive the result, and translate association into transparent business risk language.</p>
     </section>
     <div class="workflow" aria-label="Learning workflow">
       <div class="step"><strong>1</strong> Predict</div>
       <div class="step"><strong>2</strong> Explore</div>
       <div class="step"><strong>3</strong> Explain</div>
     </div>
+    <section class="panel mode-panel" aria-labelledby="analysisModeHeading">
+      <h2 id="analysisModeHeading">Choose the Chapter 11 analysis</h2>
+      <label for="analysisMode">Analysis mode
+        <select id="analysisMode">
+          <option value="independence">11.2 Independence and relative risk</option>
+          <option value="gof">11.1 Goodness of fit</option>
+        </select>
+      </label>
+      <p id="modeContext" class="panel-copy">Use a two-way table to test association and compare observed risks.</p>
+    </section>
     <main id="main"><div class="grid">
       <div class="stack">
         <section class="panel">
-          <h2>Observed counts</h2>
-          <p class="panel-copy">Two customer groups are cross-classified by whether a service failure occurred. Edit the counts to test another case.</p>
-          <div class="table-wrap"><table>
-            <thead><tr><th>Group</th><th>Failure</th><th>No failure</th></tr></thead>
-            <tbody>
-              <tr><th>New process</th><td><label><span class="sr-only">New process failures</span><input id="a" type="number" min="0" value="18"></label></td><td><label><span class="sr-only">New process no failures</span><input id="b" type="number" min="0" value="102"></label></td></tr>
-              <tr><th>Current process</th><td><label><span class="sr-only">Current process failures</span><input id="c" type="number" min="0" value="32"></label></td><td><label><span class="sr-only">Current process no failures</span><input id="d" type="number" min="0" value="88"></label></td></tr>
-            </tbody>
-          </table></div>
-          <label style="margin-top:1rem">Significance level<input id="alpha" type="number" min=".001" max=".2" step=".001" value=".05"></label>
+          <div id="independenceInputs">
+            <h2>Observed two-way counts</h2>
+            <p class="panel-copy">Two customer groups are cross-classified by whether a service failure occurred. Edit the counts to test another case.</p>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Group</th><th>Failure</th><th>No failure</th></tr></thead>
+              <tbody>
+                <tr><th>New process</th><td><label><span class="sr-only">New process failures</span><input id="a" type="number" min="0" value="18"></label></td><td><label><span class="sr-only">New process no failures</span><input id="b" type="number" min="0" value="102"></label></td></tr>
+                <tr><th>Current process</th><td><label><span class="sr-only">Current process failures</span><input id="c" type="number" min="0" value="32"></label></td><td><label><span class="sr-only">Current process no failures</span><input id="d" type="number" min="0" value="88"></label></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div id="gofInputs" class="hidden">
+            <h2>Observed category counts</h2>
+            <p class="panel-copy">Compare the observed complaint mix with a stated model. Expected percentages must total 100%.</p>
+            <div class="gof-fields">
+              <fieldset class="category-card">
+                <legend>Billing</legend>
+                <label for="gofObs0">Observed count<input id="gofObs0" type="number" min="0" value="18"></label>
+                <label for="gofPct0">Expected percentage<input id="gofPct0" type="number" min=".001" max="100" step=".1" value="25"></label>
+              </fieldset>
+              <fieldset class="category-card">
+                <legend>Delivery</legend>
+                <label for="gofObs1">Observed count<input id="gofObs1" type="number" min="0" value="22"></label>
+                <label for="gofPct1">Expected percentage<input id="gofPct1" type="number" min=".001" max="100" step=".1" value="25"></label>
+              </fieldset>
+              <fieldset class="category-card">
+                <legend>Product</legend>
+                <label for="gofObs2">Observed count<input id="gofObs2" type="number" min="0" value="35"></label>
+                <label for="gofPct2">Expected percentage<input id="gofPct2" type="number" min=".001" max="100" step=".1" value="25"></label>
+              </fieldset>
+              <fieldset class="category-card">
+                <legend>Service</legend>
+                <label for="gofObs3">Observed count<input id="gofObs3" type="number" min="0" value="25"></label>
+                <label for="gofPct3">Expected percentage<input id="gofPct3" type="number" min=".001" max="100" step=".1" value="25"></label>
+              </fieldset>
+            </div>
+          </div>
+          <label class="alpha-field" for="alpha">Significance level<input id="alpha" type="number" min=".001" max=".2" step=".001" value=".05"></label>
           <div class="button-row"><button id="run" type="button">Analyze table</button><button id="reset" class="secondary" type="button">Restore starting table</button></div>
         </section>
         <section class="panel">
@@ -45,21 +83,21 @@
       </div>
       <div class="stack">
         <section class="panel">
-          <h2>Association readout</h2>
+          <h2>Chi-square readout</h2>
           <div class="metric-grid">
             <div class="metric"><span>Chi-square</span><strong id="chi">—</strong></div>
             <div class="metric"><span>p-value</span><strong id="p">—</strong></div>
-            <div class="metric"><span>Relative risk</span><strong id="rr">—</strong></div>
+            <div class="metric"><span id="thirdMetricLabel">Relative risk</span><strong id="rr">—</strong></div>
           </div>
           <div id="result" class="result" style="margin-top:1rem" aria-live="polite"></div>
         </section>
         <section class="panel">
-          <h2>Cell contributions</h2>
+          <h2 id="contributionsHeading">Cell contributions</h2>
           <div id="cells" class="table-wrap"></div>
-          <p class="hint">Large contributions identify cells that depart most from independence. They do not by themselves explain why.</p>
+          <p class="hint">Large contributions identify cells or categories that depart most from the expected pattern. They do not by themselves explain why.</p>
         </section>
         <section class="panel">
-          <p class="prompt"><strong>Canvas focus question:</strong> Report the two observed risks, relative risk, statistical conclusion, and one sentence that avoids a causal overclaim.</p>
+          <p class="prompt"><strong>Canvas focus question:</strong> <span id="focusQuestion">Report the two observed risks, relative risk, statistical conclusion, and one sentence that avoids a causal overclaim.</span></p>
           <p class="callout"><strong>Biblical/Ethical Stewardship and Integrity:</strong> Use transparent denominators, avoid fear-inducing language, and consider the people represented by every count. Association should never be presented as proof of causation.</p>
         </section>
       </div>

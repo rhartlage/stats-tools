@@ -154,8 +154,15 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .result.error { border-color: var(--red); background: #fff0f0; }
 .result.warning { border-color: var(--gold); background: #fff8df; }
 .result.success { border-color: var(--green); background: #edf8f0; }
+.result.error h3 { color: var(--red); }
+.result.success h3 { color: var(--green); }
 .result h3 { margin: 0 0 .35rem; }
 .result p { margin: .35rem 0; line-height: 1.55; }
+.feedback-summary { margin-bottom: .75rem; }
+.feedback-summary h3 { margin: 0 0 .35rem; }
+.feedback-summary p, .feedback-note { margin: .35rem 0; line-height: 1.55; }
+.feedback-grid { display: grid; gap: .75rem; }
+.feedback-note { margin-top: .85rem; }
 .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .7rem; }
 .metric {
   border: 1px solid var(--line);
