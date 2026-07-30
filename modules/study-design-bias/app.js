@@ -10,8 +10,49 @@ const repairOptions=[["sample","Use a full-frame probability sample"],["randomiz
 const seed=document.querySelector("#seed"),scenario=document.querySelector("#scenario"),target=document.querySelector("#target"),observed=document.querySelector("#observed"),design=document.querySelector("#design"),feedback=document.querySelector("#feedback");
 let current;
 function drawChoices(root,name,options){root.innerHTML=options.map(([v,t])=>`<label class="choice"><input type="radio" name="${name}" value="${v}"><span>${t}</span></label>`).join("");}
+function optionLabel(options,value){return options.find(([v])=>v===value)?.[1]??value;}
 drawChoices(document.querySelector("#threats"),"threat",threatOptions);drawChoices(document.querySelector("#repairs"),"repair",repairOptions);
 function load(){const s=Math.max(1,Math.floor(Number(seed.value)||2150));seed.value=s;current=cases[(s*17+s%7)%cases.length];scenario.textContent=current.text;target.textContent=current.target;observed.textContent=current.observed;design.textContent=current.design;feedback.innerHTML='<div class="result"><h3>Case loaded</h3><p>Predict the primary threat and the best repair before checking.</p></div>';document.querySelectorAll('input[type=radio]').forEach(x=>x.checked=false);}
 document.querySelector("#same").onclick=load;document.querySelector("#next").onclick=()=>{seed.value=(Number(seed.value)||2150)+1;load();};
-document.querySelector("#check").onclick=()=>{const a=document.querySelector('input[name=threat]:checked')?.value,b=document.querySelector('input[name=repair]:checked')?.value;if(!a||!b){feedback.innerHTML='<div class="result warning"><h3>Complete both choices</h3><p>Select the threat and repair so the feedback can address your full diagnosis.</p></div>';return;}const ok=a===current.threat&&b===current.repair;feedback.innerHTML=`<div class="result ${ok?"success":"error"}"><h3>${ok?"Well diagnosed":"Reconsider the design"}</h3><p><strong>Primary threat:</strong> ${threatOptions.find(x=>x[0]===current.threat)[1]}. ${current.why}</p><p><strong>Best repair:</strong> ${current.fix}</p><p>Other weaknesses may exist, but prioritize the one most capable of changing the decision.</p></div>`;};
+document.querySelector("#check").onclick=()=>{
+  const a=document.querySelector('input[name=threat]:checked')?.value;
+  const b=document.querySelector('input[name=repair]:checked')?.value;
+  if(!a||!b){
+    feedback.innerHTML='<div class="result warning"><h3>Complete both choices</h3><p>Select the threat and repair so the feedback can address your full diagnosis.</p></div>';
+    return;
+  }
+
+  const threatCorrect=a===current.threat;
+  const repairCorrect=b===current.repair;
+  const summary=threatCorrect&&repairCorrect
+    ?"Well diagnosed"
+    :threatCorrect||repairCorrect
+      ?"One response is correct"
+      :"Reconsider the design";
+  const selectedThreat=optionLabel(threatOptions,a);
+  const correctThreat=optionLabel(threatOptions,current.threat);
+  const selectedRepair=optionLabel(repairOptions,b);
+  const correctRepair=optionLabel(repairOptions,current.repair);
+
+  feedback.innerHTML=`
+    <div class="feedback-summary">
+      <h3>${summary}</h3>
+      <p>Each response is evaluated separately.</p>
+    </div>
+    <div class="feedback-grid">
+      <div class="result ${threatCorrect?"success":"error"}">
+        <h3>Primary threat — ${threatCorrect?"Correct":"Needs revision"}</h3>
+        <p><strong>Your response:</strong> ${selectedThreat}.</p>
+        ${threatCorrect?"":`<p><strong>Correct response:</strong> ${correctThreat}.</p>`}
+        <p>${current.why}</p>
+      </div>
+      <div class="result ${repairCorrect?"success":"error"}">
+        <h3>Best repair — ${repairCorrect?"Correct":"Needs revision"}</h3>
+        <p><strong>Your response:</strong> ${selectedRepair}.</p>
+        ${repairCorrect?"":`<p><strong>Correct response:</strong> ${correctRepair}.</p>`}
+        <p>${current.fix}</p>
+      </div>
+    </div>
+    <p class="feedback-note">Other weaknesses may exist, but prioritize the one most capable of changing the decision.</p>`;
+};
 load();
