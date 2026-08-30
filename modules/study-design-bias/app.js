@@ -9,10 +9,29 @@ const threatOptions=[["coverage","Undercoverage / selection"],["confounding","Co
 const repairOptions=[["sample","Use a full-frame probability sample"],["randomize","Randomly assign or limit the claim"],["privacy","Use neutral private measurement"],["audit","Predefine and audit exclusions"],["control","Add a control or seasonal comparison"]];
 const seed=document.querySelector("#seed"),scenario=document.querySelector("#scenario"),target=document.querySelector("#target"),observed=document.querySelector("#observed"),design=document.querySelector("#design"),feedback=document.querySelector("#feedback");
 let current;
+function shuffleOptions(options){
+  const shuffled=options.slice();
+  for(let i=shuffled.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];
+  }
+  return shuffled;
+}
 function drawChoices(root,name,options){root.innerHTML=options.map(([v,t])=>`<label class="choice"><input type="radio" name="${name}" value="${v}"><span>${t}</span></label>`).join("");}
 function optionLabel(options,value){return options.find(([v])=>v===value)?.[1]??value;}
-drawChoices(document.querySelector("#threats"),"threat",threatOptions);drawChoices(document.querySelector("#repairs"),"repair",repairOptions);
-function load(){const s=Math.max(1,Math.floor(Number(seed.value)||2150));seed.value=s;current=cases[(s*17+s%7)%cases.length];scenario.textContent=current.text;target.textContent=current.target;observed.textContent=current.observed;design.textContent=current.design;feedback.innerHTML='<div class="result"><h3>Case loaded</h3><p>Predict the primary threat and the best repair before checking.</p></div>';document.querySelectorAll('input[type=radio]').forEach(x=>x.checked=false);}
+function load(){
+  const s=Math.max(1,Math.floor(Number(seed.value)||2150));
+  seed.value=s;
+  current=cases[(s*17+s%7)%cases.length];
+  scenario.textContent=current.text;
+  target.textContent=current.target;
+  observed.textContent=current.observed;
+  design.textContent=current.design;
+  // Shuffle each question separately only when loading a case, never during feedback.
+  drawChoices(document.querySelector("#threats"),"threat",shuffleOptions(threatOptions));
+  drawChoices(document.querySelector("#repairs"),"repair",shuffleOptions(repairOptions));
+  feedback.innerHTML='<div class="result"><h3>Case loaded</h3><p>Predict the primary threat and the best repair before checking.</p></div>';
+}
 document.querySelector("#same").onclick=load;document.querySelector("#next").onclick=()=>{seed.value=(Number(seed.value)||2150)+1;load();};
 document.querySelector("#check").onclick=()=>{
   const a=document.querySelector('input[name=threat]:checked')?.value;
