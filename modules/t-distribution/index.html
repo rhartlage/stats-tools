@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student t Distribution Explorer</title>
+  <meta name="description" content="Explore Student t probabilities and critical values with degrees of freedom, worked mathematics, and Excel formulas." />
+  <link rel="canonical" href="https://tools.benhartlage.com/t-distribution/" />
+  <meta property="og:title" content="Student t Distribution Explorer" />
+  <meta property="og:description" content="Explore Student t probabilities and inverse critical values with worked mathematics and Excel formulas." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tools.benhartlage.com/t-distribution/" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#explorer">Skip to explorer</a>
+  <div class="page-shell">
+    <header class="hero">
+      <div><p class="eyebrow">Student t Distribution Explorer</p><h1>Degrees of freedom.<br />Areas and critical values.</h1></div>
+      <p class="hero-copy">Choose degrees of freedom, shade a probability, and connect the result to critical values and Excel. Work forward from a t cutoff or backward from an area.</p>
+    </header>
+    <main id="explorer" class="workspace">
+      <section id="setupPanel" class="panel control-panel" aria-labelledby="setupTitle">
+        <div class="panel-head"><div><p class="section-kicker">1 / Set up the question</p><h2 id="setupTitle">Your t distribution</h2></div></div>
+        <div class="form-grid">
+          <label for="dfInput"><span>Degrees of freedom (df)</span><input id="dfInput" type="number" min="1" max="1000000" step="1" value="5" aria-describedby="dfHint" /></label>
+          <p id="dfHint" class="field-hint">Use a whole number from 1 to 1,000,000. For a one-sample mean, df = n − 1. Smaller df give heavier tails.</p>
+          <label for="solveMode"><span>What do you want to find?</span><select id="solveMode"><option value="probability">Find probability — start with a value</option><option value="inverse">Find cutoff — start with a probability</option></select></label>
+          <label for="regionType"><span>Shaded region</span><select id="regionType"><option value="left">Left tail — below a cutoff</option><option value="right">Right tail — above a cutoff</option><option value="between">Between two cutoffs</option><option value="absGreater">Two tails — equally far from zero</option></select></label>
+          <p id="regionHint" class="field-hint"></p>
+          <div id="forwardControls" class="form-grid">
+            <div class="slider-control">
+              <label for="aInput"><span id="aLabel">Cutoff (t)</span><input id="aInput" type="number" step="any" value="2" /></label>
+              <input id="aSlider" type="range" min="-4" max="4" step="0.01" value="2" aria-label="First cutoff in t units" />
+            </div>
+            <div id="bControl" class="slider-control" hidden>
+              <label for="bInput"><span id="bLabel">Upper cutoff (t)</span><input id="bInput" type="number" step="any" value="3" /></label>
+              <input id="bSlider" type="range" min="-4" max="4" step="0.01" value="3" aria-label="Second cutoff in t units" />
+            </div>
+          </div>
+          <div id="inverseControls" class="form-grid" hidden>
+            <label for="probabilityInput"><span>Requested shaded probability (0 to 1)</span><input id="probabilityInput" type="number" step="any" min="0" max="1" value="0.95" aria-describedby="probabilityHint" /></label>
+            <p id="probabilityHint" class="field-hint">For example, enter 0.95 for 95%. Finite cutoffs require 0 &lt; p &lt; 1.</p>
+          </div>
+          <p id="inputError" class="input-error" role="alert" hidden></p>
+        </div>
+        <section class="card">
+          <div class="card-head compact"><div><h3>Try a classroom example</h3></div></div>
+          <div class="examples">
+            <button class="button" data-example="right" type="button">df 5 · T &gt; 2</button>
+            <button class="button" data-example="between" type="button">df 10 · −1 to 2</button>
+            <button class="button" data-example="percentile" type="button">df 10 · 95th percentile</button>
+            <button class="button" data-example="central" type="button">df 5 · Middle 95%</button>
+            <button class="button" data-example="tails" type="button">df 5 · Two tails 5%</button>
+            <button class="button" data-example="cauchy" type="button">df 1 · Heavy tails</button>
+          </div>
+        </section>
+        <details class="card" id="practicePanel">
+          <summary>Predict, then check</summary>
+          <label for="estimateInput"><span>Your probability estimate (0 to 1)</span><input id="estimateInput" type="number" min="0" max="1" step="any" /></label>
+          <button id="checkEstimate" class="button" type="button">Check estimate</button>
+          <p id="estimateFeedback" role="status">Estimate the shaded fraction, then compare it with the answer.</p>
+        </details>
+        <div class="button-row"><button id="resetStart" class="button" type="button">Restore starting example</button></div>
+        <div class="return-link-row"><a class="return-link-button" href="https://tools.benhartlage.com/">Return to Stats &amp; Operations Analysis</a></div>
+      </section>
+      <div id="columnResizer" class="column-resizer" role="separator" tabindex="0" aria-label="Resize setup and graph columns" aria-orientation="vertical" aria-controls="setupPanel graphPanel" aria-describedby="resizeHelp" aria-valuemin="0" aria-valuemax="100" aria-valuenow="30" title="Drag to resize columns. Arrow keys adjust; double-click or Enter resets.">
+        <span class="resize-grip" aria-hidden="true"></span>
+        <span id="resizeHelp" class="sr-only">Drag left or right to resize the columns. Use arrow keys for small changes, Home or End for the limits, and Enter to reset.</span>
+      </div>
+      <section id="graphPanel" class="panel graph-panel" aria-labelledby="graphTitle">
+        <div class="panel-head graph-head"><div><p class="section-kicker">2 / See the connection</p><h2 id="graphTitle">Student t curve and shaded area</h2></div><span id="modelBadge" class="value-chip"></span></div>
+        <div class="plot-shell"><svg id="tSvg" viewBox="0 0 900 410" role="img" aria-label="Student t density curve and shaded probability"></svg></div>
+        <p id="plotCaption" class="plot-caption">Drag a cutoff or the shaded region. The area, mathematics, and Excel formulas update together.</p>
+        <div id="results" aria-live="polite" aria-atomic="true">
+          <section class="card objective-card">
+            <p id="questionText" class="question"></p>
+            <p id="standardQuestion" class="standard-question"></p>
+            <p id="answerText" class="answer"></p>
+          </section>
+          <section class="card working-card">
+            <p class="section-kicker">3 / Follow the math</p><h3 id="workingTitle">Connect cutoffs and probability</h3>
+            <ol id="workingSteps" class="working-steps"></ol>
+          </section>
+          <section class="card excel-card">
+            <p class="section-kicker">4 / Do the same in Excel</p><h3>Equivalent Excel formulas</h3>
+            <div id="excelFormulas" class="excel-formulas"></div>
+            <p id="excelNote" class="field-hint"></p>
+            <p class="field-hint">Shown values are rounded; calculations use full precision. Excel formulas keep the original inputs.</p>
+          </section>
+        </div>
+        <p id="copyStatus" class="field-hint" role="status"></p>
+        <details class="card function-guide"><summary>How the five Excel functions fit together</summary>
+          <dl><dt>T.DIST(t, df, TRUE)</dt><dd>Signed t cutoff → area to its left.</dd><dt>T.DIST.RT(t, df)</dt><dd>Signed t cutoff → area to its right.</dd><dt>T.DIST.2T(c, df)</dt><dd>Nonnegative magnitude c → combined area below −c and above c.</dd><dt>T.INV(p, df)</dt><dd>Left-tail probability → signed t cutoff. A probability below 0.5 gives a negative cutoff.</dd><dt>T.INV.2T(p, df)</dt><dd>Combined two-tail probability → positive critical magnitude. For middle 95%, pass 0.05.</dd></dl>
+          <p>TRUE gives cumulative probability; FALSE gives density height, not area. Since T is continuous, P(T = t) = 0.</p>
+          <p>The standard Student t distribution is symmetric about zero. Its mean is undefined at df = 1; its variance is undefined at df ≤ 2. Larger df bring it closer to the standard normal curve. There is no separate mean or standard-deviation input.</p>
+          <p>Excel truncates noninteger df; this explorer requires whole-number df so its displayed formulas use exactly the same model. A right-tail probability above 0.5 has a negative cutoff; a two-sided critical magnitude is always nonnegative.</p>
+        </details>
+        <p class="privacy-note">No sign-in, analytics, storage, external fonts, or transmitted student data. All answers are also available as text. Print or save as PDF for a worked example.</p>
+      </section>
+    </main>
+  </div>
+  <script src="./t-math.js"></script>
+  <script src="./t-model.js"></script>
+  <script src="./app.js"></script>
+  <script src="./layout.js"></script>
+</body>
+</html>
