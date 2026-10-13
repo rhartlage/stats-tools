@@ -1,0 +1,34 @@
+const assert=require('node:assert/strict');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+(async()=>{
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+ const context=await browser.newContext({viewport:{width:1440,height:1000},permissions:['clipboard-read','clipboard-write']});
+ const page=await context.newPage(),errors=[],requests=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
+ const url=process.argv[2]||'http://127.0.0.1:4186/';await page.goto(url);
+ const answer=()=>page.locator('#answerText').innerText();
+ assert.match(await answer(),/0.05096974/);
+ await page.getByRole('button',{name:'df 5 · Middle 95%'}).click();assert.match(await answer(),/-2.57058184 and 2.57058184/);
+ assert.equal(await page.locator('#excelFormulas code').first().innerText(),'=-T.INV.2T(1-0.95,5)');
+ await page.locator('.copy-button').first().click();assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),'=-T.INV.2T(1-0.95,5)');
+ await page.selectOption('#regionType','right');assert.match(await answer(),/Signed cutoff ≈ -2.01504837/);
+ await page.fill('#probabilityInput','0');assert.equal(await page.locator('#results').isVisible(),false);assert.match(await page.locator('#inputError').innerText(),/strictly between/);
+ await page.fill('#probabilityInput','1');assert.equal(await page.locator('#results').isVisible(),false);
+ await page.fill('#probabilityInput','1e-12');assert.match(await answer(),/Signed cutoff/);
+ await page.selectOption('#solveMode','probability');await page.fill('#dfInput','1.5');assert.match(await page.locator('#inputError').innerText(),/whole number/);
+ await page.fill('#dfInput','');assert.match(await page.locator('#inputError').innerText(),/finite number/);
+ await page.getByRole('button',{name:'Restore starting example'}).click();assert.match(await answer(),/0.05096974/);
+ await page.selectOption('#regionType','absGreater');await page.fill('#aInput','-2');assert.match(await page.locator('#inputError').innerText(),/magnitude/);
+ await page.fill('#aInput','2');assert.match(await answer(),/0.10193948/);
+ await page.selectOption('#regionType','between');await page.fill('#aInput','4');await page.fill('#bInput','2');assert.match(await page.locator('#inputError').innerText(),/lower cutoff/);
+ await page.fill('#aInput','2');assert.match(await answer(),/Probability ≈ 0/);
+ await page.getByRole('button',{name:'Restore starting example'}).click();await page.locator('#aSlider').focus();await page.keyboard.press('ArrowRight');assert.equal(await page.locator('#aInput').inputValue(),'2.01');
+ await page.getByRole('button',{name:'Restore starting example'}).click();const box=await page.locator('#tSvg').boundingBox();
+ await page.mouse.move(box.x+box.width*647.5/900,box.y+box.height*300/410);await page.mouse.down();await page.mouse.move(box.x+box.width*548.75/900,box.y+box.height*300/410,{steps:5});await page.mouse.up();assert.ok(Math.abs(Number(await page.locator('#aInput').inputValue())-1)<.05);
+ const separator=page.locator('#columnResizer');await separator.focus();const before=await separator.getAttribute('aria-valuenow');await page.keyboard.press('ArrowRight');assert.notEqual(await separator.getAttribute('aria-valuenow'),before);await page.keyboard.press('Enter');
+ await page.getByRole('button',{name:'df 5 · Middle 95%'}).click();
+ for(const width of [1440,1024,768,390,320]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`horizontal overflow at ${width}`);assert.equal(await page.locator('#answerText').isVisible(),true);}
+ await page.emulateMedia({media:'print'});assert.equal(await page.locator('#setupPanel').isVisible(),false);assert.equal(await page.locator('#answerText').isVisible(),true);
+ assert.deepEqual(errors,[]);assert.ok(requests.every(r=>r.startsWith(new URL(url).origin)),'external network dependency');
+ await browser.close();console.log('PASS: browser controls, signed tails, central bounds, invalid inputs, copy, drag, keyboard, 5 viewport widths, print, no external requests or JS errors.');
+})().catch(e=>{console.error(e);process.exit(1);});
