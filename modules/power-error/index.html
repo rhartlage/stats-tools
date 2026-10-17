@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Power &amp; Error Explorer | Dr. Ben Hartlage</title>
+  <meta name="description" content="Explore statistical power, Type I and Type II errors with draggable decision cutoffs, sample sizes, and live sampling-distribution formulas.">
+  <link rel="canonical" href="https://tools.benhartlage.com/power-error/">
+  <link rel="stylesheet" href="styles.css">
+  <script src="power-math.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to explorer</a>
+  <main id="main" class="pe-shell">
+    <header class="pe-header">
+      <div><p class="pe-kicker">BUS-2150 · Design a test, understand its risks</p>
+        <h1>Power &amp; Error Explorer</h1>
+        <p class="pe-intro">One decision rule. Two possible worlds. Move the cutoff and see what a test can miss.</p>
+      </div>
+      <a href="https://tools.benhartlage.com/">Return to all tools</a>
+    </header>
+    <div class="pe-presets" aria-label="Starting scenarios">
+      <span>Try a scenario</span>
+      <button type="button" data-preset="mean">Mean shift</button>
+      <button type="button" data-preset="small">Subtle effect</button>
+      <button type="button" data-preset="two">Two-sided test</button>
+      <button type="button" data-preset="proportions">14% vs 19%</button>
+      <button type="button" id="reset">Reset</button>
+    </div>
+    <div class="pe-workspace">
+      <aside class="pe-controls pe-panel" aria-labelledby="design-title">
+        <h2 id="design-title">1. Set the design</h2>
+        <form id="design" novalidate>
+          <label for="model">Sampling model</label>
+          <select id="model"><option value="mean">One mean · known σ</option><option value="proportions">Two independent proportions</option></select>
+          <label for="tail">Direction of the alternative</label>
+          <select id="tail"><option value="right">Greater than · right tail</option><option value="left">Less than · left tail</option><option value="two">Different from · two tails</option></select>
+          <div id="mean-fields">
+            <div class="pe-pair"><div><label for="mu0">Null mean μ₀</label><input id="mu0" type="number" value="100" min="-1000000" max="1000000" step="any" required></div><div><label for="mu1">Specified mean μ₁</label><input id="mu1" type="number" value="105" min="-1000000" max="1000000" step="any" required></div></div>
+            <label for="effect">Effect Δ = μ₁ − μ₀</label><input id="effect" type="number" value="5" min="-2000000" max="2000000" step="any" required>
+            <div class="pe-pair"><div><label for="sigma">Population SD σ</label><input id="sigma" type="number" value="15" min="0.001" max="1000000" step="any" required></div><div><label for="n">Sample size n</label><input id="n" type="number" value="50" min="2" max="1000000" step="1" required></div></div>
+          </div>
+          <div id="proportion-fields" hidden>
+            <div class="pe-pair"><div><label for="p1">Group 1 rate p₁</label><input id="p1" type="number" value="0.14" min="0.001" max="0.999" step="any" required></div><div><label for="p2">Group 2 rate p₂</label><input id="p2" type="number" value="0.19" min="0.001" max="0.999" step="any" required></div></div>
+            <div class="pe-pair"><div><label for="n1">Group 1 size n₁</label><input id="n1" type="number" value="681" min="2" max="1000000" step="1" required></div><div><label for="n2">Group 2 size n₂</label><input id="n2" type="number" value="681" min="2" max="1000000" step="1" required></div></div>
+            <p class="pe-hint">Rates determine Bernoulli variability p(1 − p); there is no separate σ control.</p>
+          </div>
+          <label for="alpha">Type I error rate α (probability)</label><input id="alpha" type="number" value="0.05" min="0.0001" max="0.9999" step="any" required>
+          <p class="pe-hint">0.05 means 5%. Changing n keeps α fixed and moves the cutoff. Changing the cutoff changes α.</p>
+        </form>
+        <div class="pe-cutoffs">
+          <h2>2. Move the decision</h2>
+          <div class="pe-pair"><div id="lower-field"><label for="lower">Lower cutoff</label><input id="lower" type="number" step="any"></div><div id="upper-field"><label for="upper">Upper cutoff</label><input id="upper" type="number" step="any"></div></div>
+          <p id="cutoff-note" class="pe-hint"></p><p class="pe-hint">For numeric cutoffs, press Enter or leave the field to apply. α is limited to 0.0001–0.9999.</p>
+          <button type="button" id="refit">Fit axes to this design</button>
+        </div>
+        <p id="validation" role="status" class="pe-validation"></p>
+      </aside>
+      <section class="pe-results" aria-labelledby="chart-title">
+        <div class="pe-panel pe-chart-panel">
+          <div class="pe-chart-heading"><div><p class="pe-kicker">Repeated samples, not individual observations</p><h2 id="chart-title">Sampling distributions</h2></div><label class="pe-shade-label" for="shading">Shade<select id="shading"><option value="all">All regions</option><option value="alpha">α only</option><option value="beta">β only</option><option value="power">Power only</option></select></label></div>
+          <p id="hypotheses" class="pe-hypotheses"></p>
+          <div class="pe-legend"><span><i class="pe-null"></i> Null model H₀</span><span><i class="pe-alt"></i> Specified distribution</span><span><i class="pe-beta"></i> <span id="beta-legend">β (hatched)</span></span><span><i class="pe-power"></i> <span id="power-legend">Power</span></span></div>
+          <div id="plot-wrap"><svg id="plot" viewBox="0 0 900 390" aria-labelledby="plot-title plot-desc"><title id="plot-title">Sampling densities and decision cutoffs</title><desc id="plot-desc">Drag a vertical cutoff, or focus it and use arrow keys. Exact probabilities and interpretations follow the chart.</desc><defs><pattern id="beta-hatch" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#dfdef2" fill-opacity=".7"/><path d="M-1,1 l3,-3 M0,7 l7,-7 M6,8 l3,-3" stroke="#6c56a2" stroke-width="1.5"/></pattern><clipPath id="plot-clip"><rect id="clip-rect"/></clipPath></defs><g id="grid"></g><g id="curves" clip-path="url(#plot-clip)"></g><g id="axis"></g><g id="lower-bar" class="pe-bar" role="slider" tabindex="0" aria-label="Lower decision cutoff"><rect class="pe-bar-hit"/><line/><rect class="pe-bar-handle" rx="6"/><text class="pe-grip" aria-hidden="true">↔</text></g><g id="upper-bar" class="pe-bar" role="slider" tabindex="0" aria-label="Upper decision cutoff"><rect class="pe-bar-hit"/><line/><rect class="pe-bar-handle" rx="6"/><text class="pe-grip" aria-hidden="true">↔</text></g></svg></div>
+          <p class="pe-hint pe-gesture">Drag either vertical bar. Keyboard: Tab to a bar, ←/→ to move, Shift for larger steps, Home/End for plot limits. Numeric cutoffs work too.</p>
+          <p id="axis-note" class="pe-hint"></p>
+          <p id="decision-rule" class="pe-rule"></p>
+          <p id="model-warning" class="pe-warning" role="status"></p>
+        </div>
+        <div class="pe-metrics" aria-live="polite" aria-atomic="true">
+          <article class="pe-metric pe-alpha-card"><h3>α · Type I error</h3><strong id="alpha-value"></strong><p id="alpha-meaning"></p></article>
+          <article class="pe-metric pe-beta-card"><h3 id="beta-label">β · Type II error</h3><strong id="beta-value"></strong><p id="beta-meaning"></p></article>
+          <article class="pe-metric pe-power-card"><h3 id="power-label">1 − β · Power</h3><strong id="power-value"></strong><p id="power-meaning"></p></article>
+        </div>
+        <p class="pe-identity" id="identity">β + power = 1 for the specified alternative. α and β describe different sampling worlds; they do not need to add to 1.</p>
+      </section>
+    </div>
+    <section class="pe-panel pe-formulas" aria-labelledby="formula-title"><p class="pe-kicker">Connect the picture to the mathematics</p><h2 id="formula-title">Live formulas &amp; substitutions</h2><p>N(m, s²) denotes a normal distribution with mean m and variance s². Φ is the standard normal cumulative distribution function.</p><div id="formulas"></div><p id="method-note"></p></section>
+    <section class="pe-panel pe-teaching" aria-labelledby="teaching-title"><h2 id="teaching-title">What to notice</h2><div class="pe-lessons">
+      <article><h3>Trade one risk for another</h3><p>Hold n, effect, and variability fixed. Move a right-tail cutoff farther right: α falls, β rises, and power falls. Two-sided cutoffs move symmetrically, with α/2 in each tail.</p></article>
+      <article><h3>More information separates the worlds</h3><p>At fixed α, larger samples narrow the sampling distributions. For an effect in the chosen direction, power increases. A larger effect or less population variability also makes it easier to detect.</p><p>Try quadrupling n: the standard error halves. The raw horizontal scale stays fixed until you change the effect/variability or fit the axes.</p></article>
+      <article><h3>A decision is not a verdict on truth</h3><p>Failing to reject H₀ does not prove H₀. α is not the probability H₀ is true, and power is not the probability a significant result is correct. These are long-run decision rates conditional on a model.</p></article>
+      <article><h3>Power needs an effect to detect</h3><p>Specify a scientifically meaningful effect before collecting data. There is no single power for a study without that choice. Do not plug an observed effect back in to claim “observed” or post-hoc power; report estimates and uncertainty instead.</p></article>
+      <article><h3>Sampling distributions are not populations</h3><p>Each point on these curves represents a possible sample mean or difference in sample proportions across repeated studies. Increasing n reduces uncertainty in that estimate; it does not reduce the population’s σ.</p></article>
+      <article><h3>Choose the right model</h3><p>The mean model assumes independent observations and known σ, with a normal population (exact) or an adequate normal approximation. The proportions model assumes independent groups and independent Bernoulli observations with adequate expected counts.</p><p>Unknown-σ mean tests use t distributions; variance tests use χ² under normality. Their power requires different alternative distributions. They are not implemented here. A rule such as n &gt; 30 is not a universal guarantee.</p></article>
+    </div><p class="pe-related">Continue with <a href="https://tools.benhartlage.com/sampling-distribution/">Sampling Distribution Explorer</a>, <a href="https://tools.benhartlage.com/inference-decision/">Inference &amp; Decision</a>, and <a href="https://tools.benhartlage.com/t-distribution/">Student t Explorer</a>.</p><p class="pe-source-note">Method references: <a href="https://www.itl.nist.gov/div898/handbook/prc/section2/prc222.htm">NIST: sample size, effect, and error rates</a> · <a href="https://support.sas.com/kb/24/298.html#notes">SAS: two-proportion power methods (technical notes)</a> · <a href="https://doi.org/10.1198/000313001300339897">Hoenig &amp; Heisey: the misuse of observed power</a>. No student data are saved or sent.</p></section>
+    <noscript>This explorer needs JavaScript for its interactive calculations. The teaching notes above remain available.</noscript>
+  </main>
+</body>
+</html>
