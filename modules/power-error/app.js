@@ -8,6 +8,7 @@
   const fields = ['mu0','mu1','sigma','n','p1','p2','n1','n2','alpha'];
   const fmt = (x,d=4) => !Number.isFinite(x) ? (x<0?'−∞':'∞') : (Math.abs(x)>0 && Math.abs(x)<.0001 ? x.toExponential(3) : Number(x.toFixed(d)).toLocaleString('en-US',{maximumFractionDigits:d}));
   const pct = x => (x*100).toFixed(x>0&&x<.0001?5:2)+'%';
+  const tick = (x,d=3) => Math.abs(x)>=10000?x.toExponential(1):fmt(x,d);
   const text = (id,value) => { $(id).textContent=value; };
   const activeFields = () => state.model==='mean'?['mu0','mu1','effect','sigma','n','alpha']:['p1','p2','n1','n2','alpha'];
   function sync() {
@@ -90,9 +91,9 @@
     geometry={left,right,top,bottom,width,height,X,Y};
     const clip=$('clip-rect');for(const [k,v]of Object.entries({x:left,y:top,width:right-left,height:bottom-top}))clip.setAttribute(k,v);
     let grid='',axis='';
-    for(let i=0;i<=4;i++){const v=ymax*i/4,y=Y(v);grid+=`<line x1="${left}" x2="${right}" y1="${y}" y2="${y}" stroke="#e0e5ec"/><text x="${left-7}" y="${y+4}" text-anchor="end">${fmt(v,3)}</text>`;}
+    for(let i=0;i<=4;i++){const v=ymax*i/4,y=Y(v);grid+=`<line x1="${left}" x2="${right}" y1="${y}" y2="${y}" stroke="#e0e5ec"/><text x="${left-7}" y="${y+4}" text-anchor="end">${tick(v)}</text>`;}
     const ticks=width<450?4:6;
-    for(let i=0;i<=ticks;i++){const v=bounds[0]+(bounds[1]-bounds[0])*i/ticks,x=X(v);axis+=`<line x1="${x}" x2="${x}" y1="${bottom}" y2="${bottom+5}" stroke="#738096"/><text x="${x}" y="${bottom+21}" text-anchor="middle">${fmt(v,state.model==='mean'?1:3)}</text>`;}
+    for(let i=0;i<=ticks;i++){const v=bounds[0]+(bounds[1]-bounds[0])*i/ticks,x=X(v);axis+=`<line x1="${x}" x2="${x}" y1="${bottom}" y2="${bottom+5}" stroke="#738096"/><text x="${x}" y="${bottom+21}" text-anchor="middle">${tick(v,state.model==='mean'?1:3)}</text>`;}
     axis+=`<text x="${left}" y="17">Probability density</text><text x="${(left+right)/2}" y="${height-12}" text-anchor="middle">${state.model==='mean'?'Sample mean x̄ (raw units)':'Sample proportion difference p̂₂ − p̂₁'}</text>`;
     $('grid').innerHTML=grid; $('axis').innerHTML=axis;
     const density=(v,m,s)=>M.normalPDF((v-m)/s)/s;
@@ -133,7 +134,7 @@
   $('design').addEventListener('submit',e=>e.preventDefault());
   $('design').addEventListener('input',e=>{
     const id=e.target.id;if(id==='model'||id==='tail')return;
-    const invalid=activeFields().filter(key=>!$(key).validity.valid||$(key).value==='');
+    const invalid=activeFields().filter(key=>!(id==='effect'&&key==='mu1')&&(!$(key).validity.valid||$(key).value===''));
     for(const key of activeFields())$(key).setAttribute('aria-invalid',String(invalid.includes(key)));
     if(invalid.length){text('validation','Enter valid values in the marked fields. Results show the last valid design.');return;}
     let next={...state};for(const key of fields)if(activeFields().includes(key))next[key]=Number($(key).value);
