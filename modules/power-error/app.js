@@ -5,6 +5,7 @@
   const M = window.PowerMath;
   const defaults = {model:'mean',tail:'right',mu0:100,mu1:105,sigma:15,n:50,p1:.14,p2:.19,n1:681,n2:681,alpha:.05};
   let state = {...defaults}, result, bounds, yAnchor, geometry, dragging;
+  const cutoffEdits=new Set();
   const fields = ['mu0','mu1','sigma','n','p1','p2','n1','n2','alpha'];
   const fmt = (x,d=4) => !Number.isFinite(x) ? (x<0?'−∞':'∞') : (Math.abs(x)>0 && Math.abs(x)<.0001 ? x.toExponential(3) : Number(x.toFixed(d)).toLocaleString('en-US',{maximumFractionDigits:d}));
   const pct = x => (x*100).toFixed(x>0&&x<.0001?5:2)+'%';
@@ -144,11 +145,16 @@
   });
   for(const id of ['model','tail'])$(id).addEventListener('change',()=>{state[id]=$(id).value;sync();recalculate(true);});
   for(const id of ['lower','upper'])$(id).addEventListener('change',()=>{
+    cutoffEdits.delete(id);
     const v=Number($(id).value);
     if($(id).value===''||!Number.isFinite(v)){text('validation','Enter a finite decision cutoff. Results show the last valid design.');$(id).setAttribute('aria-invalid','true');return;}
     if(state.tail==='two'&&((id==='lower'&&v>=result.mean0)||(id==='upper'&&v<=result.mean0))){text('validation','A two-sided lower cutoff must be below the null; the upper cutoff must be above it.');$(id).setAttribute('aria-invalid','true');return;}
     setCutoff(v);
   });
+  for(const id of ['lower','upper']){
+    $(id).addEventListener('input',()=>cutoffEdits.add(id));
+    $(id).addEventListener('blur',()=>{if(cutoffEdits.has(id))$(id).dispatchEvent(new Event('change'));});
+  }
   for(const id of ['lower','upper'])$(id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$(id).dispatchEvent(new Event('change'));}});
   for(const id of ['lower','upper']){
     const bar=$(id+'-bar');
