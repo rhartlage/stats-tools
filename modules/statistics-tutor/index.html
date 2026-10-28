@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Statistics Tutor | Dr. Ben Hartlage</title>
+    <meta
+      name="description"
+      content="Reason through confidence intervals for one population mean with guided questions, targeted hints, randomized practice, and sampling experiments."
+    />
+    <!-- prettier-ignore -->
+    <link rel="canonical" href="https://tools.benhartlage.com/statistics-tutor/" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.mjs"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#activity">Skip to activity</a>
+    <a class="standalone-return" href="https://tools.benhartlage.com/">
+      Return to all tools
+    </a>
+    <main id="activity" tabindex="-1" class="tutor">
+      <header class="intro">
+        <div>
+          <p class="eyebrow">BUS-2150 · OPTIONAL PRACTICE</p>
+          <h1>
+            Reason your way
+            <br />
+            to confidence.
+          </h1>
+          <p class="lede">
+            A statistics tutor that asks the next question.
+            <br />
+            Make a prediction. Follow a hint. Find the meaning.
+          </p>
+        </div>
+        <div class="topic-box">
+          <label for="topic">What would you like to learn?</label>
+          <select id="topic"></select>
+          <p>
+            Start with one population mean.
+            <br />
+            More topics can be added here later.
+          </p>
+          <span class="local-badge">No account · No AI connection</span>
+        </div>
+      </header>
+      <div class="workspace-nav" role="group" aria-label="Learning views">
+        <button data-view="guided" aria-pressed="true">
+          01 · Guided practice
+        </button>
+        <button data-view="width" aria-pressed="false">02 · Width lab</button>
+        <button data-view="sampling" aria-pressed="false">
+          03 · Repeated samples
+        </button>
+      </div>
+      <section id="guided-view" aria-label="Guided practice">
+        <div class="practice-grid">
+          <aside class="journey">
+            <p class="eyebrow">YOUR LEARNING PATH</p>
+            <ol id="journey"></ol>
+            <p id="progress-text"></p>
+            <progress
+              id="progress"
+              value="0"
+              max="12"
+              aria-label="Questions explored"
+            ></progress>
+            <p class="quiet">
+              Take your time. Hints are part of learning, and this activity is
+              not graded.
+            </p>
+            <button id="fresh" class="secondary">Try a fresh problem</button>
+            <button id="reset" class="text-button">Restart this problem</button>
+          </aside>
+          <div>
+            <section class="scenario" aria-labelledby="scenario-heading">
+              <div class="scenario-top">
+                <h2 id="scenario-heading">The investigation</h2>
+                <span id="problem-id"></span>
+              </div>
+              <p id="scenario-text"></p>
+              <dl id="givens"></dl>
+              <details>
+                <summary>Sampling conditions for this exercise</summary>
+                <p>
+                  The sample is randomly selected from a population much larger
+                  than the sample. Observations are independent. Measurements
+                  come from a roughly normal population with no extreme
+                  outliers. The population standard deviation is unknown. These
+                  are assumptions of the exercise, not facts established by n
+                  alone.
+                </p>
+              </details>
+            </section>
+            <section
+              id="question-card"
+              class="question-card"
+              aria-labelledby="question-title"
+            >
+              <p id="step-label" class="eyebrow"></p>
+              <h2 id="question-title" tabindex="-1"></h2>
+              <p id="question-prompt"></p>
+              <form id="answer-form" novalidate>
+                <div id="answer-fields"></div>
+                <button id="check" type="submit">Check my reasoning</button>
+              </form>
+              <div
+                id="feedback"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              ></div>
+              <div class="help-row">
+                <button id="hint" class="secondary">Give me a hint</button>
+                <button id="worked" class="text-button">
+                  Show the explanation
+                </button>
+              </div>
+              <div id="hint-content" aria-live="polite"></div>
+              <aside id="companion" class="companion" hidden></aside>
+              <nav class="step-nav" aria-label="Practice steps">
+                <button id="previous" class="secondary">← Previous</button>
+                <span id="step-count"></span>
+                <button id="next">Next question →</button>
+              </nav>
+            </section>
+            <section id="complete" class="question-card" hidden></section>
+          </div>
+        </div>
+      </section>
+      <section id="width-view" class="lab" aria-labelledby="width-title" hidden>
+        <div class="lab-heading">
+          <p class="eyebrow">CHANGE ONE THING AT A TIME</p>
+          <h2 id="width-title" tabindex="-1">What makes an interval wider?</h2>
+          <p>
+            Predict first, then move a control. The sample mean stays at 50.
+            This is a comparison of formulas with other inputs held fixed, not a
+            new sample.
+          </p>
+        </div>
+        <div class="lab-grid">
+          <div class="lab-controls">
+            <label for="width-n">
+              Sample size n
+              <output id="width-n-value">25</output>
+            </label>
+            <input id="width-n" type="range" min="5" max="100" value="25" />
+            <label for="width-sd">
+              Sample standard deviation s
+              <output id="width-sd-value">10</output>
+            </label>
+            <input id="width-sd" type="range" min="1" max="20" value="10" />
+            <label for="width-confidence">Confidence level</label>
+            <select id="width-confidence">
+              <option value="0.9">90%</option>
+              <option value="0.95" selected>95%</option>
+              <option value="0.99">99%</option>
+            </select>
+            <button id="width-reset" class="secondary">Reset comparison</button>
+          </div>
+          <div>
+            <div id="width-chart" class="chart"></div>
+            <p id="width-result" role="status"></p>
+            <p class="formula">x̄ ± t* × s / √n</p>
+            <ul class="takeaways">
+              <li>Larger n → narrower interval, other inputs fixed.</li>
+              <li>Larger s → wider interval.</li>
+              <li>Higher confidence → wider interval.</li>
+            </ul>
+            <p>
+              Precision is not the same as accuracy. A narrow interval from
+              biased sampling can still miss the population mean.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section
+        id="sampling-view"
+        class="lab"
+        aria-labelledby="sampling-title"
+        hidden
+      >
+        <div class="lab-heading">
+          <p class="eyebrow">A FIXED MEAN. CHANGING INTERVALS.</p>
+          <h2 id="sampling-title" tabindex="-1">
+            What does confidence look like?
+          </h2>
+          <p>
+            Take independent random samples from a normal population with fixed
+            μ = 50 and σ = 10. Every sample gets its own x̄, s, and t interval.
+            Predict: will every interval contain 50?
+          </p>
+        </div>
+        <div class="simulation-controls">
+          <label for="sim-n">
+            Sample size
+            <select id="sim-n">
+              <option>10</option>
+              <option selected>25</option>
+              <option>100</option>
+            </select>
+          </label>
+          <label for="sim-confidence">
+            Confidence
+            <select id="sim-confidence">
+              <option value=".9">90%</option>
+              <option value=".95" selected>95%</option>
+              <option value=".99">99%</option>
+            </select>
+          </label>
+          <button id="sample-one">Draw 1 sample</button>
+          <button id="sample-hundred">Draw 100 samples</button>
+          <button id="sim-reset" class="secondary">Clear samples</button>
+        </div>
+        <p id="simulation-summary" role="status" aria-live="polite"></p>
+        <div id="sampling-chart" class="chart"></div>
+        <p class="quiet">
+          Solid line + dot: contains μ. Dashed line + ×: misses μ. The chart
+          shows the latest 30 intervals; the count includes every sample in this
+          run. Nothing runs automatically.
+        </p>
+        <details>
+          <summary>Read the latest intervals as a table</summary>
+          <div class="table-wrap">
+            <table>
+              <caption>Latest 30 samples</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Sample</th>
+                  <th scope="col">Mean</th>
+                  <th scope="col">Sample SD</th>
+                  <th scope="col">Lower</th>
+                  <th scope="col">Upper</th>
+                  <th scope="col">Contains μ?</th>
+                </tr>
+              </thead>
+              <tbody id="samples-table"></tbody>
+            </table>
+          </div>
+        </details>
+        <p>
+          Over many repetitions, coverage approaches the confidence level under
+          these assumptions. A batch can be above or below that level. Once an
+          interval is observed, it either contains the fixed population mean or
+          it does not.
+        </p>
+      </section>
+      <footer class="tutor-footer">
+        <p>
+          <strong>Your responses stay on this page.</strong>
+          No answers are sent, and no browser storage is used. Reloading or
+          closing the page clears your progress. This is structured guided
+          practice, not a chat service.
+        </p>
+        <details>
+          <summary>About this tutor &amp; references</summary>
+          <p>
+            Version 1.0.0 · One population mean, unknown population standard
+            deviation. Questions and feedback are authored; no live AI or
+            free-text interpretation is used. Use a calculator if helpful.
+            Optional practice does not submit work or assign a grade.
+          </p>
+          <p>
+            <a
+              href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              NIST: Confidence limits for the mean (new tab)
+            </a>
+          </p>
+        </details>
+      </footer>
+    </main>
+    <noscript>
+      <p>
+        This tutor needs JavaScript for its questions and simulations. Enable
+        JavaScript or use the NIST confidence interval reference linked above.
+      </p>
+    </noscript>
+  </body>
+</html>
