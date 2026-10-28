@@ -16,35 +16,42 @@
     <script type="module" src="app.mjs"></script>
   </head>
   <body>
-    <a class="skip-link" href="#activity">Skip to activity</a
-    ><a class="standalone-return" href="https://tools.benhartlage.com/"
-      >Return to all tools</a
-    >
+    <a class="skip-link" href="#activity">Skip to activity</a>
+    <a class="standalone-return" href="https://tools.benhartlage.com/">
+      Return to all tools
+    </a>
     <main id="activity" tabindex="-1" class="tutor">
       <header class="intro">
         <div>
           <p class="eyebrow">BUS-2150 · OPTIONAL PRACTICE</p>
-          <h1>Reason your way<br />to confidence.</h1>
+          <h1>
+            Reason your way
+            <br />
+            to confidence.
+          </h1>
           <p class="lede">
-            A statistics tutor that asks the next question.<br />Make a
-            prediction. Follow a hint. Find the meaning.
+            A statistics tutor that asks the next question.
+            <br />
+            Make a prediction. Follow a hint. Find the meaning.
           </p>
         </div>
         <div class="topic-box">
-          <label for="topic">What would you like to learn?</label
-          ><select id="topic"></select>
+          <label for="topic">What would you like to learn?</label>
+          <select id="topic"></select>
           <p>
-            Start with one population mean.<br />More topics can be added here
-            later.
+            Start with one population mean.
+            <br />
+            More topics can be added here later.
           </p>
           <span class="local-badge">No account · No AI connection</span>
         </div>
       </header>
       <div class="workspace-nav" role="group" aria-label="Learning views">
         <button data-view="guided" aria-pressed="true">
-          01 · Guided practice</button
-        ><button data-view="width" aria-pressed="false">02 · Width lab</button
-        ><button data-view="sampling" aria-pressed="false">
+          01 · Guided practice
+        </button>
+        <button data-view="width" aria-pressed="false">02 · Width lab</button>
+        <button data-view="sampling" aria-pressed="false">
           03 · Repeated samples
         </button>
       </div>
@@ -64,10 +71,8 @@
               Take your time. Hints are part of learning, and this activity is
               not graded.
             </p>
-            <button id="fresh" class="secondary">Try a fresh problem</button
-            ><button id="reset" class="text-button">
-              Restart this problem
-            </button>
+            <button id="fresh" class="secondary">Try a fresh problem</button>
+            <button id="reset" class="text-button">Restart this problem</button>
           </aside>
           <div>
             <section class="scenario" aria-labelledby="scenario-heading">
@@ -108,17 +113,17 @@
                 aria-atomic="true"
               ></div>
               <div class="help-row">
-                <button id="hint" class="secondary">Give me a hint</button
-                ><button id="worked" class="text-button">
+                <button id="hint" class="secondary">Give me a hint</button>
+                <button id="worked" class="text-button">
                   Show the explanation
                 </button>
               </div>
               <div id="hint-content" aria-live="polite"></div>
               <aside id="companion" class="companion" hidden></aside>
               <nav class="step-nav" aria-label="Practice steps">
-                <button id="previous" class="secondary">← Previous</button
-                ><span id="step-count"></span
-                ><button id="next">Next question →</button>
+                <button id="previous" class="secondary">← Previous</button>
+                <span id="step-count"></span>
+                <button id="next">Next question →</button>
               </nav>
             </section>
             <section id="complete" class="question-card" hidden></section>
@@ -137,31 +142,23 @@
         </div>
         <div class="lab-grid">
           <div class="lab-controls">
-            <label for="width-n"
-              >Sample size n <output id="width-n-value">25</output></label
-            ><input
-              id="width-n"
-              type="range"
-              min="5"
-              max="100"
-              value="25"
-            /><label for="width-sd"
-              >Sample standard deviation s
-              <output id="width-sd-value">10</output></label
-            ><input
-              id="width-sd"
-              type="range"
-              min="1"
-              max="20"
-              value="10"
-            /><label for="width-confidence">Confidence level</label
-            ><select id="width-confidence">
+            <label for="width-n">
+              Sample size n
+              <output id="width-n-value">25</output>
+            </label>
+            <input id="width-n" type="range" min="5" max="100" value="25" />
+            <label for="width-sd">
+              Sample standard deviation s
+              <output id="width-sd-value">10</output>
+            </label>
+            <input id="width-sd" type="range" min="1" max="20" value="10" />
+            <label for="width-confidence">Confidence level</label>
+            <select id="width-confidence">
               <option value="0.9">90%</option>
               <option value="0.95" selected>95%</option>
-              <option value="0.99">99%</option></select
-            ><button id="width-reset" class="secondary">
-              Reset comparison
-            </button>
+              <option value="0.99">99%</option>
+            </select>
+            <button id="width-reset" class="secondary">Reset comparison</button>
           </div>
           <div>
             <div id="width-chart" class="chart"></div>
@@ -197,21 +194,25 @@
           </p>
         </div>
         <div class="simulation-controls">
-          <label for="sim-n"
-            >Sample size<select id="sim-n">
+          <label for="sim-n">
+            Sample size
+            <select id="sim-n">
               <option>10</option>
               <option selected>25</option>
               <option>100</option>
-            </select></label
-          ><label for="sim-confidence"
-            >Confidence<select id="sim-confidence">
+            </select>
+          </label>
+          <label for="sim-confidence">
+            Confidence
+            <select id="sim-confidence">
               <option value=".9">90%</option>
               <option value=".95" selected>95%</option>
               <option value=".99">99%</option>
-            </select></label
-          ><button id="sample-one">Draw 1 sample</button
-          ><button id="sample-hundred">Draw 100 samples</button
-          ><button id="sim-reset" class="secondary">Clear samples</button>
+            </select>
+          </label>
+          <button id="sample-one">Draw 1 sample</button>
+          <button id="sample-hundred">Draw 100 samples</button>
+          <button id="sim-reset" class="secondary">Clear samples</button>
         </div>
         <p id="simulation-summary" role="status" aria-live="polite"></p>
         <div id="sampling-chart" class="chart"></div>
@@ -224,9 +225,7 @@
           <summary>Read the latest intervals as a table</summary>
           <div class="table-wrap">
             <table>
-              <caption>
-                Latest 30 samples
-              </caption>
+              <caption>Latest 30 samples</caption>
               <thead>
                 <tr>
                   <th scope="col">Sample</th>
@@ -250,10 +249,10 @@
       </section>
       <footer class="tutor-footer">
         <p>
-          <strong>Your responses stay on this page.</strong> No answers are
-          sent, and no browser storage is used. Reloading or closing the page
-          clears your progress. This is structured guided practice, not a chat
-          service.
+          <strong>Your responses stay on this page.</strong>
+          No answers are sent, and no browser storage is used. Reloading or
+          closing the page clears your progress. This is structured guided
+          practice, not a chat service.
         </p>
         <details>
           <summary>About this tutor &amp; references</summary>
@@ -268,17 +267,18 @@
               href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm"
               target="_blank"
               rel="noopener noreferrer"
-              >NIST: Confidence limits for the mean (new tab)</a
             >
+              NIST: Confidence limits for the mean (new tab)
+            </a>
           </p>
         </details>
       </footer>
     </main>
-    <noscript
-      ><p>
+    <noscript>
+      <p>
         This tutor needs JavaScript for its questions and simulations. Enable
         JavaScript or use the NIST confidence interval reference linked above.
-      </p></noscript
-    >
+      </p>
+    </noscript>
   </body>
 </html>
