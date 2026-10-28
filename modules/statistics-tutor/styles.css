@@ -68,7 +68,8 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
-summary:focus-visible {
+summary:focus-visible,
+.table-wrap:focus-visible {
   outline: 3px solid #b05a00;
   outline-offset: 4px;
 }
