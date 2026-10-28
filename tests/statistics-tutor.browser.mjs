@@ -59,6 +59,15 @@ try {
     await page.locator("#topic").focus();
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Tab");
+    await page.locator('input[type="radio"]').first().focus();
+    await page.keyboard.press("Space");
+    assert.equal(await page.locator('input:checked').count(), 1);
+    await page.locator('#check').focus();
+    await page.keyboard.press("Enter");
+    assert((await page.locator('#feedback').textContent()).length > 0);
+    await page.locator('#reset').focus();
+    await page.keyboard.press("Enter");
+    assert.equal(await page.locator('input:checked').count(), 0);
     const session = createSession(topics[0], 1025);
     for (let i = 0; i < session.steps.length; i++) {
       const step = session.steps[i];
